@@ -59,7 +59,18 @@ makeX <- function(formula, mf, degree, na.ok = FALSE)
 
     ## Linear terms (if any)
     if (length(formula)[2] > 1) {
-        X <- cbind(X, model.matrix(formula, data = mf, rhs = 2))
+        ## Need to save "polyTerms" attribute or cbind() will destroy it
+        pt1 <- attr(X, "polyTerms")
+        Xlin <- model.matrix(formula, data = mf, rhs = 2)
+        X <- cbind(X, Xlin)
+
+        ## Add the new variables to "polyTerms"
+        nlin <- ncol(Xlin)
+        pt <- cbind(pt1, matrix(0, nrow = nrow(pt1), ncol = nlin))
+        pt <- rbind(pt,
+                    cbind(matrix(0, nrow = nlin, ncol = ncol(pt1)), diag(nlin)))
+        colnames(pt) <- c(colnames(pt1), colnames(Xlin))
+        attr(X, "polyTerms") <- pt
     }
 
     return(X)

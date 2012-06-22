@@ -134,6 +134,6 @@ polym2 <- function (x, degree = 1, na.ok = FALSE)
     colnames(res) <- apply(z, 1L,
                            function(x) paste(x[!is.na(x)], collapse = "."))
     attr(res, "degree") <- as.vector(s)
-    attr(res, "polyTerms") <- oldz
+    attr(res, "polyTerms") <- as.matrix(oldz, rownames.force = FALSE)
     return(res)
 }
