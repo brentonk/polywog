@@ -64,7 +64,8 @@ predict.polywog <- function(object, newdata,
         warning("Options 'interval' and 'bag' not available for models without a 'boot.matrix' element")
     }
 
-    ## Setup largely adapted from 'predict.lm' code
+    ## Setup largely adapted from predict.lm() code; the bits relating to
+    ## 'newdata' being a model frame are adapted from mgcv::predict.gam()
     tt <- terms(object)
     if (missing(newdata) || is.null(newdata)) {
         ## Use original model matrix if available
@@ -75,6 +76,15 @@ predict.polywog <- function(object, newdata,
             X <- makeX(object$formula, object$model, object$degree)
             X <- X[, object$pivot, drop = FALSE]
         }
+        nd.is.mf <- FALSE
+    } else if (is.data.frame(newdata) && !is.null(attr(newdata, "terms"))) {
+        ## 'newdata' is a model frame -- this case must be treated separately,
+        ## or else predVals() and margEff.polywog() won't work when the original
+        ## model formula contains transformations of the original inputs
+
+        X <- makeX(object$formula, mf, object$degree, na.ok = TRUE)
+        X <- X[, object$pivot, drop = FALSE]
+        nd.is.mf <- TRUE
     } else {
         ## Construct model frame from 'newdata'
         Terms <- delete.response(tt)
@@ -88,6 +98,7 @@ predict.polywog <- function(object, newdata,
         ## Construct polynomial-expanded model matrix and remove collinear terms
         X <- makeX(object$formula, mf, object$degree, na.ok = TRUE)
         X <- X[, object$pivot, drop = FALSE]
+        nd.is.mf <- FALSE
     }
     X <- cbind("(Intercept)" = 1L, X)
 
@@ -137,6 +148,8 @@ predict.polywog <- function(object, newdata,
     ## 'predict.lm')
     if (missing(newdata) || is.null(newdata)) {
         pred <- napredict(object$na.action, pred)
+    } else if (nd.is.mf) {
+        pred <- napredict(attr(newdata, "na.action"), pred)
     } else {
         pred <- napredict(attr(mf, "na.action"), pred)
     }
