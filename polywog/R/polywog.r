@@ -1,4 +1,5 @@
 ##' @include helpers.r
+##' @include fitters.r
 NULL
 
 ##' Bootstrapped basis regression with oracle model selection
@@ -16,104 +17,6 @@ NULL
 ##' Functional Form Estimation: Bootstrapped Basis Regression with Variable
 ##' Selection."  Typescript, University of Rochester.
 NULL
-
-##
-## Calculate penalty weights via logistic regression for adaptive lasso with
-## binary outcomes
-##
-## ARGUMENTS:
-##   X: polynomial expansion of covariate matrix (without intercept)
-##   y: response variable
-##   weights: vector of observation weights
-##
-## RETURN:
-##   numeric vector of penalty weights for coefficients
-##
-penaltyWeightsBinary <- function(X, y, weights)
-{
-    ## Compute coefficients
-    ans <- suppressWarnings(glm.fit(x = cbind(1L, X), y = y, weights = weights,
-                                    family = binomial()))
-
-    ## Separation check and convergence check (same as in 'glm.fit', but with
-    ## warning messages tailored for this use case)
-    if (!ans$converged)
-        warning("'glm.fit' did not converge when computing penalty weights; consider using penwt.method = \"lm\"")
-    eps <- 10 * .Machine$double.eps
-    if (any(ans$fitted > 1 - eps) || any(ans$fitted < eps))
-        warning("fitted probabilities numerically 0 or 1 occurred when computing penalty weights; consider using penwt.method = \"lm\"")
-
-    ## Calculate weights from coefficients (exclude intercept)
-    ans <- 1 / abs(ans$coef[-1])
-    return(ans)
-}
-
-##
-## Calculate adaptive lasso results.  k-fold cross-validation is used to select
-## the penalization parameter if 'lambda' is NULL.
-##
-## This function is used within 'polywog' (and 'bootPolywog'); it typically
-## should not be called directly by a user.
-##
-## ARGUMENTS:
-##   X: polynomial-expanded covariate matrix (without intercept)
-##   y: response variable
-##   weights: vector of observation weights
-##   family: "gaussian" or "binomial"
-##   penwt: vector of covariate weights for adaptive penalization
-##   lambda: penalization parameter (NULL to cross-validate)
-##   nfolds: number of cross-validation folds
-##
-## RETURN:
-##   coef: coefficients from the fitted adaptive lasso model
-##   lambda: penalization parameter used to obtain coefficients
-##
-fitALasso <- function(X, y, weights, family, penwt, lambda, nfolds, ...)
-{
-    if (is.null(lambda)) {
-        ## Cross-validate
-        ans.cv <- cv.glmnet(x = X, y = y, weights = weights, family = family,
-                            standardize = FALSE, penalty.factor = penwt,
-                            nfolds = nfolds)
-        lambda <- ans.cv$lambda.min
-        which.lambda <- which(ans.cv$lambda == lambda)
-        coef <- c(ans.cv$glmnet.fit$a0[which.lambda],
-                  ans.cv$glmnet.fit$beta[, which.lambda])
-    } else {
-        ## Run 'glmnet' directly
-        ans <- glmnet(x = X, y = y, weights = weights, family = family,
-                      standardize = FALSE, penalty.factor = penwt,
-                      lambda = lambda)
-        coef <- c(ans$a0[1], ans$beta[, 1])
-    }
-    names(coef)[1] <- "(Intercept)"
-    return(list(coef = coef, lambda = lambda))
-}
-
-##
-## Analogue of fitALasso, for SCAD
-##
-fitSCAD <- function(X, y, weights, family, lambda, nfolds, scad.maxit, ...)
-{
-    if (is.null(lambda)) {
-        ## Cross-validate
-        ans.cv <- cv.ncvreg(sqrt(weights) * X, sqrt(weights) * y,
-                            family = family, penalty = "SCAD",
-                            max.iter = scad.maxit, nfolds = nfolds)
-        lambda <- ans.cv$lambda[ans.cv$min]
-        which.lambda <- ans.cv$min
-        ans <- ncvreg(sqrt(weights) * X, sqrt(weights) * y, family = family,
-                      penalty = "SCAD", max.iter = scad.maxit)
-        coef <- ans$beta[, which.lambda]
-    } else {
-        ## Run 'ncvreg' directly
-        ans <- ncvreg(sqrt(weights) * X, sqrt(weights) * y, family = family,
-                      penalty = "SCAD", lambda = c(0, lambda),
-                      max.iter = scad.maxit)
-        coef <- ans$beta[, 2]
-    }
-    return(list(coef = coef, lambda = lambda))
-}
 
 ##' Polynomial regression with oracle variable selection
 ##'
@@ -144,7 +47,9 @@ fitSCAD <- function(X, y, weights, family, lambda, nfolds, scad.maxit, ...)
 ##'
 ##' For both the adaptive LASSO and SCAD, the penalization factor \eqn{\lambda}
 ##' is chosen by k-fold cross-validation.  The selected value minimizes the
-##' average mean squared error of out-of-sample fits.
+##' average mean squared error of out-of-sample fits.  (To select both
+##' \eqn{\lambda} and the polynomial degree simultaneously via cross-validation,
+##' see \code{\link{cv.polywog}}.)
 ##'
 ##' The bootstrap iterations may be run in parallel via
 ##' \code{\link[foreach]{foreach}} by registering an appropriate backend and
@@ -165,7 +70,8 @@ fitSCAD <- function(X, y, weights, family, lambda, nfolds, scad.maxit, ...)
 ##' @param family \code{"gaussian"} (default) or \code{"binomial"} for logistic
 ##' regression (binary response only).
 ##' @param method variable selection method: \code{"alasso"} (default) for
-##' adaptive LASSO or \code{"scad"} for SCAD.
+##' adaptive LASSO or \code{"scad"} for SCAD.  You can also select \code{method
+##' = "none"} to return the model matrix and other information without fitting.
 ##' @param penwt.method estimator for obtaining first-stage estimates in
 ##' logistic models when \code{method = "alasso"}: \code{"lm"} (default) for a
 ##' linear probability model, \code{"glm"} for logistic regression.
@@ -234,6 +140,8 @@ fitSCAD <- function(X, y, weights, family, lambda, nfolds, scad.maxit, ...)
 ##' \code{\link{bootPolywog}}.  To generate fitted values, see
 ##' \code{\link{predVals}} (and the underlying method
 ##' \code{\link{predict.polywog}}).  For plots, see \code{\link{plot.polywog}}.
+##' The polynomial degree may be selected via cross-validation using
+##' \code{\link{cv.polywog}}.
 ##'
 ##' Polynomial basis expansions of matrix inputs are computed with
 ##' \code{\link{polym2}}.
@@ -273,7 +181,7 @@ fitSCAD <- function(X, y, weights, family, lambda, nfolds, scad.maxit, ...)
 polywog <- function(formula, data, subset, weights, na.action,
                     degree = 3,
                     family = c("gaussian", "binomial"),
-                    method = c("alasso", "scad"),
+                    method = c("alasso", "scad", "none"),
                     penwt.method = c("lm", "glm"),
                     boot = 0, control.boot = control.bp(),
                     .parallel = FALSE,
@@ -316,6 +224,8 @@ polywog <- function(formula, data, subset, weights, na.action,
     if (!is.null(w) && !is.numeric(w)) 
         stop("'weights' must be a numeric vector")
     nowt <- is.null(w)
+    if (!nowt && method == "scad")
+        stop("weights not allowed with method = \"scad\"")
     if (nowt)
         w <- rep(1, length(y))
     if (any(w < 0))
@@ -331,10 +241,11 @@ polywog <- function(formula, data, subset, weights, na.action,
     lmcoef <- qr.coef(qx, sqrt(w) * y)[pivot]
     qx <- NULL  # To save memory
     pivot <- pivot[-1] - 1  # Account for lack of intercept in X
+    polyTerms <- attr(X, "polyTerms")[pivot, ]
     X <- X[, pivot, drop = FALSE]
 
     ## Compute penalty weights for adaptive lasso models
-    if (method == "alasso") {
+    if (method != "scad") {
         penwt <- 1 / abs(lmcoef[-1])
         if (penwt.method != "lm" && family == "binomial") {
             penwt <- penaltyWeightsBinary(X, y, w)
@@ -350,7 +261,8 @@ polywog <- function(formula, data, subset, weights, na.action,
     ## Compute cross-validated model fit
     fitPolywog <- switch(method,
                          alasso = fitALasso,
-                         scad = fitSCAD)
+                         scad = fitSCAD,
+                         none = function(...) NULL)
     pfit <- fitPolywog(X = X, y = y, weights = w, family = family,
                        penwt = penwt, lambda = NULL, nfolds = nfolds,
                        scad.maxit = scad.maxit)
@@ -368,7 +280,8 @@ polywog <- function(formula, data, subset, weights, na.action,
     ans <- list(coefficients = pfit$coef,
                 lambda = pfit$lambda,
                 # (2)
-                fitted.values = drop(cbind(1L, X) %*% pfit$coef),
+                fitted.values =
+                if (method != "none") drop(cbind(1L, X) %*% pfit$coef) else NULL,
                 # (3)
                 lmcoef = lmcoef,
                 penwt = penwt,
@@ -386,7 +299,7 @@ polywog <- function(formula, data, subset, weights, na.action,
                 nobs = nrow(X),
                 na.action = attr(mf, "na.action"),
                 xlevels = .getXlevels(terms, mf),
-                polyTerms = attr(X, "polyTerms")[pivot, ],
+                polyTerms = polyTerms,
                 # (6)
                 varNames = varNames,
                 call = cl)
@@ -399,7 +312,7 @@ polywog <- function(formula, data, subset, weights, na.action,
         ans$y <- y
 
     ## Bootstrapping, if requested
-    if (boot > 0) {
+    if (boot > 0 && method != "none") {
         ## Temporarily include model in object if necessary
         if (!model && !(ret.X && ret.y))
             ans$model <- mf
