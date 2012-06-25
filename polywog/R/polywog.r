@@ -125,8 +125,8 @@ NULL
 ##'   \item{\code{xlevels}}{levels of factor variables used in fitting.}
 ##'   \item{\code{polyTerms}}{a matrix recording how many powers of each raw
 ##' input term are represented in each column of the design matrix.}
-##'   \item{\code{varNames}}{a list of the names of the raw input variables included
-##' within the polynomial expansion and linearly.}
+##'   \item{\code{varNames}}{names of the raw input variables included in the
+##' model.}
 ##'   \item{\code{call}}{the original function call.}
 ##'   \item{\code{model}}{(if requested) the model frame (see
 ##' \code{\link{model.frame}}).}
@@ -206,13 +206,16 @@ polywog <- function(formula, data, subset, weights, na.action,
     terms <- attr(mf, "terms")
 
     ## Store variable names (for use in 'print.polywog')
-    varNames <- vector("list", 2)
+    varNames <- character()
+    expanded <- logical()
     for (i in seq_len(length(formula)[2])) {
         tt <- terms(stats::formula(formula, rhs = i), data = mf,
                     simplify = TRUE)
-        varNames[[i]] <- all.vars(delete.response(tt))
+        tt <- attr(tt, "term.labels")
+        varNames <- c(varNames, tt)
+        expanded <- c(expanded, rep(i == 1, length(tt)))
     }
-    names(varNames) <- c("polynomial", "linear")
+    attr(varNames, "expanded") <- expanded
 
     ## Extract response variable and perform sanity check
     y <- model.part(formula, mf, lhs = 1, drop = TRUE)
@@ -567,12 +570,13 @@ print.polywog <- function(x, ...)
         "\n\n", sep = "")
 
     ## Extract lists of expanded and non-expanded terms
-    inTerms <- paste(x$varNames$polynomial, collapse = ", ")
+    expanded <- attr(x$varNames, "expanded")
+    inTerms <- paste(x$varNames[expanded], collapse = ", ")
     cat("Variables included in polynomial expansion of degree ", x$degree, ":\n",
         sep = "")
     writeLines(strwrap(inTerms, prefix = "  "))
-    if (!is.null(x$varNames$linear)) {
-        outTerms <- paste(x$varNames$linear, collapse = ", ")
+    if (any(!expanded)) {
+        outTerms <- paste(x$varNames[!expanded], collapse = ", ")
         cat("\nVariables included linearly:\n")
         writeLines(strwrap(outTerms, prefix = "  "))
     }

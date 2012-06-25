@@ -30,7 +30,7 @@ preplotFromPick <- function(x, pick, ...)
 ##' of \code{\link{polywog}}.
 ##' @param which selection of variables to plot: a character vector containing
 ##' one or two names of raw input variables (see \code{x$varNames}).  May also
-##' be a numeric vector corresponding to indices of \code{unlist(x$varNames)}.
+##' be a numeric vector corresponding to indices of \code{x$varNames}.
 ##' If \code{which = NULL}, a plot of each individual term will be generated.
 ##' @param ask logical: whether to display an interactive menu of terms to
 ##' select.
@@ -104,7 +104,7 @@ plot.polywog <- function(x, which = NULL, ask = FALSE, auto.set.par = TRUE,
     pp <- NULL  # To avoid return error when no plot selected
 
     ## Extract regressor names
-    xnames <- unname(unlist(x$varNames))
+    xnames <- x$varNames
 
     if (ask) {
         while (TRUE) {
