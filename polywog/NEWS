@@ -12,6 +12,9 @@ polywog 0.2-0 (2012-06-XX)
 * New function cv.polywog() to select both the polynomial degree and the
   penalization parameter by cross-validation
 
+* New method margEff.polywog() to compute observation-wise and average marginal
+  effects from a fitted model
+
 * "polyTerms" attribute of matrix returned by polym2() is now a matrix rather
   than a data frame
 

@@ -12,11 +12,13 @@ Depends:
     glmnet (>= 1.5.1),
     ncvreg,
     Formula,
-    Matrix
+    Matrix,
+    miscTools
 Imports:
     stringr,
     games,
-    car
+    car,
+    matrixStats
 Suggests:
     foreach,
     lattice,

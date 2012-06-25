@@ -82,7 +82,7 @@ predict.polywog <- function(object, newdata,
         ## or else predVals() and margEff.polywog() won't work when the original
         ## model formula contains transformations of the original inputs
 
-        X <- makeX(object$formula, mf, object$degree, na.ok = TRUE)
+        X <- makeX(object$formula, newdata, object$degree, na.ok = TRUE)
         X <- X[, object$pivot, drop = FALSE]
         nd.is.mf <- TRUE
     } else {
