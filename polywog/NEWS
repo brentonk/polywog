@@ -15,6 +15,9 @@ polywog 0.2-0 (2012-06-XX)
 * New method margEff.polywog() to compute observation-wise and average marginal
   effects from a fitted model
 
+* varNames element of a "polywog" object is now a character vector rather than a
+  list (and is generated more safely)
+
 * "polyTerms" attribute of matrix returned by polym2() is now a matrix rather
   than a data frame
 

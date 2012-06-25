@@ -2,12 +2,19 @@
 ##' @include fn_pred.r
 NULL
 
-# NOT COMPLETE; DO NOT USE THESE FUNCTIONS YET
-
 ##' @method margEff polywog
 ##' @export
 margEff.polywog <- function(object, xvar = NULL, drop = FALSE, ...)
 {
+    ## If no variable specified, apply to each variable in the model
+    if (is.null(xvar)) {
+        ans <- lapply(object$varNames,
+                      function(x) margEff(object, xvar = x, drop = drop))
+        names(ans) <- object$varNames
+        class(ans) <- "margEff.polywog"
+        return(ans)
+    }
+
     ## Extract original model data
     mf <- object$model
     if (is.null(mf))
@@ -29,7 +36,7 @@ margEff.polywog <- function(object, xvar = NULL, drop = FALSE, ...)
             Xraw <- cbind(Xraw, model.matrix(formula, data = mf, rhs = 2))
 
         xc <- getXcols(xvar, colnames(Xraw))
-        ncoef <- length(coef(object)) - 1  # Subtracting intercept
+        ncoef <- length(coef(object)) - 1  # Not considering intercept
         pt <- object$polyTerms
         ans <- rep(0, nrow(Xraw))
 
@@ -89,9 +96,92 @@ margEff.polywog <- function(object, xvar = NULL, drop = FALSE, ...)
         attr(ans, "levels") <- levs
     }
 
+    attr(ans, "xvar") <- xvar
+    class(ans) <- "margEff.polywog"
     ans
 }
 
+##' @S3method print margEff.polywog
+print.margEff.polywog <- function(x, ...)
+{
+    ## Print minimal information
+    if (is.list(x)) {
+        cat("Marginal effects of all variables in a fitted model of class \"polywog\"\n")
+    } else {
+        cat("Marginal effect of", attr(x, "xvar"), "in a fitted model of class \"polywog\"\n")
+    }
+    invisible(x)
+}
+
+
+## Convenience function to make a data frame out of a list of marginal effects
+MEtoDF <- function(object)
+{
+    ## Figure out which entries are first differences
+    whichFactors <- sapply(object, function(x) !is.null(attr(x, "levels")))
+
+    ## Make intelligible names for first difference entries
+    for (i in seq_len(sum(whichFactors))) {
+        j <- which(whichFactors)[i]
+        object[[j]] <- as.matrix(object[[j]])
+        levs <- attr(object[[j]], "levels")
+        xvar <- attr(object[[j]], "xvar")
+        colnames(object[[j]]) <-
+            paste(xvar, "=", levs[-length(levs)], " (vs. ",
+                  levs[length(levs)], ")", sep = "")
+    }
+
+    as.data.frame(do.call(cbind, object))
+}
+
+##' @S3method summary margEff.polywog
+summary.margEff.polywog <- function(object, probs = seq(0, 1, by = 0.25), ...)
+{
+    if (!is.list(object)) {
+        object <- list(object)
+        names(object) <- attr(object[[1]], "xvar")
+    }
+
+    object <- MEtoDF(object)
+    object <- sapply(object,
+                     function(x) c("Mean" = mean(x), "SD" = sd(x),
+                                   quantile(x, probs = probs)))
+    object <- t(object)
+    class(object) <- "summary.margEff.polywog"
+    object
+}
+
+##' @S3method print summary.margEff.polywog
+print.summary.margEff.polywog <- function(x,
+                                          digits = max(3, getOption("digits") - 3),
+                                          ...)
+{
+    printCoefmat(zapsmall(x), digits = digits, ...)
+    invisible(x)
+}
+
+##' @S3method plot margEff.polywog
+plot.margEff.polywog <- function(x, ...)
+{
+    if (!is.list(x)) {
+        x <- list(x)
+        names(x) <- attr(x[[1]], "xvar")
+    }
+
+    x <- MEtoDF(x)
+
+    ## Obtain dimensions
+    mfrow <- ceiling(sqrt(length(x)))
+    mfcol <- ceiling(length(x) / mfrow)
+    op <- par(mfrow = c(mfrow, mfcol))
+    on.exit(par(op))
+
+    ## Plot each density plot
+    for (i in seq_along(x))
+        plot(density(x[[i]]), main = names(x)[i], ...)
+
+    invisible(x)
+}
 
 ## Bug-fixed version of matrixStats::rowProds (which was released under an
 ## Artistic-2.0 license, which is compatible with the GPL and hence can be
