@@ -110,15 +110,14 @@
   fitting.} \item{\code{polyTerms}}{a matrix recording how
   many powers of each raw input term are represented in
   each column of the design matrix.}
-  \item{\code{varNames}}{a list of the names of the raw
-  input variables included within the polynomial expansion
-  and linearly.} \item{\code{call}}{the original function
-  call.} \item{\code{model}}{(if requested) the model frame
-  (see \code{\link{model.frame}}).} \item{\code{X}}{(if
-  requested) the basis-expanded design matrix.}
-  \item{\code{y}}{(if requested) the response variable.}
-  \item{\code{boot.matrix}}{(if \code{boot > 0}) a sparse
-  matrix of class
+  \item{\code{varNames}}{names of the raw input variables
+  included in the model.} \item{\code{call}}{the original
+  function call.} \item{\code{model}}{(if requested) the
+  model frame (see \code{\link{model.frame}}).}
+  \item{\code{X}}{(if requested) the basis-expanded design
+  matrix.} \item{\code{y}}{(if requested) the response
+  variable.} \item{\code{boot.matrix}}{(if \code{boot > 0})
+  a sparse matrix of class
   \code{"\link[=dgCMatrix-class]{dgCMatrix}"} containing
   bootstrap coefficients (see \code{\link{bootPolywog}}).}
   }

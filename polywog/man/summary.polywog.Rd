@@ -26,7 +26,7 @@
   model.
 }
 \description{
-  Generate a "regression table" to summarize the fitted
+  Generates a "regression table" to summarize the fitted
   model, including coefficients along with their
   bootstrapped standard errors and confidence intervals.
   If the fitted model does not have a \code{boot.matrix}

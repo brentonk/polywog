@@ -34,7 +34,7 @@
   observations in \code{newdata} containing \code{NA}s
   (default \code{\link{na.pass}}).  See "Details".}
 
-  \item{...}{additional arguments, currently ignored.}
+  \item{...}{other arguments, currently ignored.}
 }
 \value{
   If \code{interval = TRUE}, a matrix containing each
@@ -73,6 +73,7 @@
 }
 \seealso{
   For more user-friendly generation of fitted values, see
-  \code{\link{predVals}}.
+  \code{\link{predVals}}.  To compute marginal effects, see
+  \code{\link{margEff.polywog}}.
 }
 

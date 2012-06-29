@@ -56,6 +56,11 @@ NULL
 ##'                   degrees.cv = 1:4, nfolds = 10)
 ##'
 ##' print(cv1)
+##'
+##' ## Extract best model and bootstrap
+##' fit1 <- cv1$polywog.fit
+##' fit1 <- bootPolywog(fit1, nboot = 10)
+##' summary(fit1)
 cv.polywog <- function(formula,
                        ...,
                        method = c("alasso", "scad"),

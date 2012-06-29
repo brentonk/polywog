@@ -15,7 +15,7 @@
   \item{which}{selection of variables to plot: a character
   vector containing one or two names of raw input variables
   (see \code{x$varNames}).  May also be a numeric vector
-  corresponding to indices of \code{unlist(x$varNames)}. If
+  corresponding to indices of \code{x$varNames}. If
   \code{which = NULL}, a plot of each individual term will
   be generated.}
 

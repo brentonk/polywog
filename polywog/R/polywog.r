@@ -603,7 +603,7 @@ vcov.polywog <- function(object, ...)
 
 ##' Summarize a fitted polywog model
 ##'
-##' Generate a "regression table" to summarize the fitted model, including
+##' Generates a "regression table" to summarize the fitted model, including
 ##' coefficients along with their bootstrapped standard errors and confidence
 ##' intervals.  If the fitted model does not have a \code{boot.matrix} element,
 ##' the output will contain \code{NA}s for the standard errors, and confidence
