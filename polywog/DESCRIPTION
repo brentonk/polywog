@@ -1,7 +1,7 @@
 Package: polywog
 Title: Bootstrapped Basis Regression with Oracle Model Selection
-Version: 0.2-0
-Date: 2012-06-26
+Version: 0.2-1
+Date: 2012-07-09
 Author: Brenton Kenkel and Curtis S. Signorino
 Maintainer: Brenton Kenkel <brenton.kenkel@gmail.com>
 Description: Routines for flexible functional form estimation via basis

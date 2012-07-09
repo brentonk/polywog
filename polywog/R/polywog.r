@@ -343,10 +343,10 @@ polywog <- function(formula, data, subset, weights, na.action,
 ##' @author Brenton Kenkel and Curtis S. Signorino
 ##' @export
 control.bp <- function(reuse.lambda = FALSE, reuse.penwt = FALSE,
-                       report = FALSE, scad.maxit = 5000)
+                       maxtries = 1000, report = FALSE, scad.maxit = 5000)
 {
     list(reuse.lambda = reuse.lambda, reuse.penwt = reuse.penwt,
-         report = report, scad.maxit = scad.maxit)
+         maxtries = maxtries, report = report, scad.maxit = scad.maxit)
 }
 
 ##
@@ -402,6 +402,9 @@ bootFit <- function(X, y, weights, family, lambda, penwt, method, penwt.method,
 ##' @param reuse.penwt logical: whether to use the penalty weights from the
 ##' original dataset for adaptive LASSO models (\code{TRUE}), or to re-calculate
 ##' penalty weights within each iteration (\code{FALSE}, default).
+##' @param maxtries maximum number of attempts to generate a bootstrap sample
+##' with a non-collinear model matrix (often problematic with lopsided binary
+##' regressors) before failing.
 ##' @param report logical: whether to print a status bar.  Not available if
 ##' \code{.parallel = TRUE}.
 ##' @param scad.maxit maximum number of iterations for \code{\link{ncvreg}} in
@@ -450,7 +453,8 @@ bootFit <- function(X, y, weights, family, lambda, penwt, method, penwt.method,
 ##' stopWorkers(w)
 ##' }
 bootPolywog <- function(model, nboot = 100, reuse.lambda = FALSE,
-                        reuse.penwt = FALSE, report = FALSE, scad.maxit = 5000,
+                        reuse.penwt = FALSE, maxtries = 1000, report = FALSE,
+                        scad.maxit = 5000,
                         .parallel = FALSE, .matrixOnly = FALSE)
 {
     ## Load 'foreach' package for parallelization if requested
@@ -504,9 +508,13 @@ bootPolywog <- function(model, nboot = 100, reuse.lambda = FALSE,
     if (.parallel) {
         ## Loop in parallel via 'foreach'
         ans <- foreach (i = seq_len(nboot), .packages = "polywog") %dopar% {
+            tries <- 0
             repeat {
                 ## Ensure that the bootstrap X matrix has the same rank as the
                 ## original one
+                tries <- tries + 1
+                if (tries > maxtries)
+                    stop("'maxtries' reached; no non-collinear bootstrap sample found")
                 ind <- sample(seq_len(nobs), nobs, replace = TRUE)
                 if (qr(cbind(1L, X[ind, , drop = FALSE]))$rank == ncf)
                     break
@@ -520,9 +528,13 @@ bootPolywog <- function(model, nboot = 100, reuse.lambda = FALSE,
         ## Use a sequential 'for' loop
         ans <- vector("list", nboot)
         for (i in seq_len(nboot)) {
+            tries <- 0
             repeat {
                 ## Ensure that the bootstrap X matrix has the same rank as the
                 ## original one
+                tries <- tries + 1
+                if (tries > maxtries)
+                    stop("'maxtries' reached; no non-collinear bootstrap sample found")
                 ind <- sample(seq_len(nobs), nobs, replace = TRUE)
                 if (qr(cbind(1L, X[ind, , drop = FALSE]))$rank == ncf)
                     break

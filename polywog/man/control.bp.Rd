@@ -3,7 +3,7 @@
 \title{Auxiliary for bootstrap options}
 \usage{
   control.bp(reuse.lambda = FALSE, reuse.penwt = FALSE,
-    report = FALSE, scad.maxit = 5000)
+    maxtries = 1000, report = FALSE, scad.maxit = 5000)
 }
 \arguments{
   \item{reuse.lambda}{logical: whether to use the
@@ -15,6 +15,11 @@
   weights from the original dataset for adaptive LASSO
   models (\code{TRUE}), or to re-calculate penalty weights
   within each iteration (\code{FALSE}, default).}
+
+  \item{maxtries}{maximum number of attempts to generate a
+  bootstrap sample with a non-collinear model matrix (often
+  problematic with lopsided binary regressors) before
+  failing.}
 
   \item{report}{logical: whether to print a status bar.
   Not available if \code{.parallel = TRUE}.}

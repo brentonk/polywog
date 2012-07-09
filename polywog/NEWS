@@ -6,6 +6,13 @@
 ============================================================
 
 
+polywog 0.2-1 (2012-07-XX)
+--------------------------
+
+* bootPolywog() now has argument maxtries to control failure when a non-collinear
+  bootstrap model matrix cannot be found
+
+
 polywog 0.2-0 (2012-06-26)
 --------------------------
 

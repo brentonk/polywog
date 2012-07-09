@@ -3,8 +3,9 @@
 \title{Bootstrap a fitted polywog model}
 \usage{
   bootPolywog(model, nboot = 100, reuse.lambda = FALSE,
-    reuse.penwt = FALSE, report = FALSE, scad.maxit = 5000,
-    .parallel = FALSE, .matrixOnly = FALSE)
+    reuse.penwt = FALSE, maxtries = 1000, report = FALSE,
+    scad.maxit = 5000, .parallel = FALSE,
+    .matrixOnly = FALSE)
 }
 \arguments{
   \item{model}{a fitted model of class \code{"polywog"},
@@ -21,6 +22,11 @@
   weights from the original dataset for adaptive LASSO
   models (\code{TRUE}), or to re-calculate penalty weights
   within each iteration (\code{FALSE}, default).}
+
+  \item{maxtries}{maximum number of attempts to generate a
+  bootstrap sample with a non-collinear model matrix (often
+  problematic with lopsided binary regressors) before
+  failing.}
 
   \item{report}{logical: whether to print a status bar.
   Not available if \code{.parallel = TRUE}.}
