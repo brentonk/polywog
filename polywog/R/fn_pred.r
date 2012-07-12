@@ -432,12 +432,10 @@ predVals <- function(model, xvars, xlims = list(), n = 100, interval = TRUE,
         warning("Options 'interval' and 'bag' not available for models without a 'boot.matrix' element")
     }
 
-    ## Extract original model data and remove dependent variable
+    ## Extract original model data
     dat <- model$model
     if (is.null(dat))
         stop("Fitted object must contain 'model' to use predVals; re-run polywog with \"model = TRUE\"")
-    dat <- model.frame(delete.response(terms(model)), data = dat, na.action =
-                       na.omit, xlev = model$xlevels)
 
     ## Create the varying part of the fitted value profile
     xc <- getXcols(xvars, names(dat))
@@ -456,9 +454,9 @@ predVals <- function(model, xvars, xlims = list(), n = 100, interval = TRUE,
     ## Calculate fitted values and combine with data frame
     fit <- predict(model, newdata = x, type = "response", interval = interval,
                    level = level, bag = bag)
-    ans <- structure(cbind(fit, x),
+    ans <- structure(cbind(fit, x[, -1]),
                      interval = interval,
                      xvars = xvars,
-                     xcol = xc + ifelse(length(dim(fit)), 3, 1))
+                     xcol = xc - 1 + ifelse(length(dim(fit)), 3, 1))
     return(ans)
 }
