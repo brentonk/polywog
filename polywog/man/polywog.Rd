@@ -5,10 +5,10 @@
   polywog(formula, data, subset, weights, na.action,
     degree = 3, family = c("gaussian", "binomial"),
     method = c("alasso", "scad", "none"),
-    penwt.method = c("lm", "glm"), boot = 0,
-    control.boot = control.bp(), .parallel = FALSE,
-    model = TRUE, X = FALSE, y = FALSE, nfolds = 10,
-    scad.maxit = 5000)
+    penwt.method = c("lm", "glm"), penalize.linear = TRUE,
+    boot = 0, control.boot = control.bp(),
+    .parallel = FALSE, model = TRUE, X = FALSE, y = FALSE,
+    nfolds = 10, scad.maxit = 5000)
 }
 \arguments{
   \item{formula}{model formula specifying the response and
@@ -43,6 +43,11 @@
   estimates in logistic models when \code{method =
   "alasso"}: \code{"lm"} (default) for a linear probability
   model, \code{"glm"} for logistic regression.}
+
+  \item{penalize.linear}{logical: whether the penalty
+  should be applied to any terms that are excluded from the
+  basis expansion (see "Details" below).  Not available if
+  \code{method = "scad"}.}
 
   \item{boot}{number of bootstrap iterations (0 for no
   bootstrapping).}
@@ -98,6 +103,10 @@
   \item{\code{penwt.method}}{estimator for penalty weights
   in adaptive LASSO models, \code{"lm"} or \code{"glm"}; is
   \code{NULL} if \code{method = "scad"}.}
+  \item{\code{penalize.linear}}{whether terms included
+  linearly are penalized.} \item{\code{which.linear}}{which
+  columns of the model matrix (without intercept) are terms
+  not included in the basis expansion.}
   \item{\code{nfolds}}{number of cross-validation folds.}
   \item{\code{terms}}{the \code{\link{terms}} object used
   in fitting.} \item{\code{pivot}}{indices of the

@@ -75,6 +75,9 @@ NULL
 ##' @param penwt.method estimator for obtaining first-stage estimates in
 ##' logistic models when \code{method = "alasso"}: \code{"lm"} (default) for a
 ##' linear probability model, \code{"glm"} for logistic regression.
+##' @param penalize.linear logical: whether the penalty should be applied to any
+##' terms that are excluded from the basis expansion (see "Details" below).  Not
+##' available if \code{method = "scad"}.
 ##' @param boot number of bootstrap iterations (0 for no bootstrapping).
 ##' @param control.boot list of arguments to be passed to
 ##' \code{\link{bootPolywog}} when bootstrapping; see \code{\link{control.bp}}.
@@ -115,6 +118,10 @@ NULL
 ##'   \item{\code{penwt.method}}{estimator for penalty weights in adaptive LASSO
 ##' models, \code{"lm"} or \code{"glm"}; is \code{NULL} if \code{method =
 ##' "scad"}.}
+##'   \item{\code{penalize.linear}}{whether terms included linearly are
+##' penalized.}
+##'   \item{\code{which.linear}}{which columns of the model matrix (without
+##' intercept) are terms not included in the basis expansion.}
 ##'   \item{\code{nfolds}}{number of cross-validation folds.}
 ##'   \item{\code{terms}}{the \code{\link{terms}} object used in fitting.}
 ##'   \item{\code{pivot}}{indices of the non-collinear columns of the full basis
@@ -183,6 +190,7 @@ polywog <- function(formula, data, subset, weights, na.action,
                     family = c("gaussian", "binomial"),
                     method = c("alasso", "scad", "none"),
                     penwt.method = c("lm", "glm"),
+                    penalize.linear = TRUE,
                     boot = 0, control.boot = control.bp(),
                     .parallel = FALSE,
                     model = TRUE, X = FALSE, y = FALSE,
@@ -238,14 +246,18 @@ polywog <- function(formula, data, subset, weights, na.action,
     X <- makeX(formula, mf, degree)
 
     ## Compute linear model coefficients and eliminate singularities in X via
-    ## the QR decomposition
+    ## the QR decomposition.  Also record which columns of X correspond to terms
+    ## not included in basis expansion (necessary if penalize.linear = FALSE).
     qx <- qr(sqrt(w) * cbind(1L, X))
     pivot <- qx$pivot[seq_len(qx$rank)]
     lmcoef <- qr.coef(qx, sqrt(w) * y)[pivot]
     qx <- NULL  # To save memory
     pivot <- pivot[-1] - 1  # Account for lack of intercept in X
     polyTerms <- attr(X, "polyTerms")[pivot, ]
+    which.linear <- attr(X, "which.linear")
+    which.linear <- which.linear[which.linear %in% pivot]
     X <- X[, pivot, drop = FALSE]
+    which.linear <- rev(seq_len(ncol(X)))[seq_along(which.linear)]
 
     ## Compute penalty weights for adaptive lasso models
     if (method != "scad") {
@@ -260,6 +272,14 @@ polywog <- function(formula, data, subset, weights, na.action,
         penwt <- NULL
         penwt.method <- NULL
     }
+
+    ## Sanity check for 'penalize.linear'
+    if (!penalize.linear && method == "scad") {
+        penalize.linear <- TRUE
+        warning("option 'penalize.linear' is not allowed with method = \"scad\"")
+    }
+    if (!penalize.linear)
+        penwt[which.linear] <- 0
 
     ## Compute cross-validated model fit
     fitPolywog <- switch(method,
@@ -295,6 +315,8 @@ polywog <- function(formula, data, subset, weights, na.action,
                 weights = if (nowt) NULL else w,
                 method = method,
                 penwt.method = penwt.method,
+                penalize.linear = penalize.linear,
+                which.linear = which.linear,
                 nfolds = nfolds,
                 # (5)
                 terms = terms,
@@ -353,7 +375,7 @@ control.bp <- function(reuse.lambda = FALSE, reuse.penwt = FALSE,
 ## Innards of the bootstrap procedure
 ##
 bootFit <- function(X, y, weights, family, lambda, penwt, method, penwt.method,
-                    nfolds, scad.maxit, pb, i)
+                    penalize.linear, which.linear, nfolds, scad.maxit, pb, i)
 {
     ## Calculate penalty weights unless specified
     if (method == "alasso" && is.null(penwt)) {
@@ -363,6 +385,9 @@ bootFit <- function(X, y, weights, family, lambda, penwt, method, penwt.method,
         } else {
             penwt <- penaltyWeightsBinary(X, y, weights)
         }
+
+        if (!penalize.linear)
+            penwt[which.linear] <- 0
     }
 
     ## Fit model on bootstrap data and catch any convergence errors
@@ -484,6 +509,8 @@ bootPolywog <- function(model, nboot = 100, reuse.lambda = FALSE,
     weights <- model$weights
     if (is.null(weights))
         weights <- rep(1, nobs)
+    penalize.linear <- model$penalize.linear
+    which.linear <- model$which.linear
 
     ## Obtain original model matrix and response
     if (!is.null(model$X)) {
@@ -522,6 +549,7 @@ bootPolywog <- function(model, nboot = 100, reuse.lambda = FALSE,
             polywog:::bootFit(X = X[ind, , drop = FALSE], y = y[ind], weights =
                     weights[ind], family = family, lambda = lambda, penwt =
                     penwt, method = method, penwt.method = penwt.method,
+                    penalize.linear = penalize.linear, which.linear = which.linear,
                     nfolds = nfolds, scad.maxit = scad.maxit, pb = pb, i = i)
         }
     } else {
@@ -543,6 +571,8 @@ bootPolywog <- function(model, nboot = 100, reuse.lambda = FALSE,
                 bootFit(X = X[ind, , drop = FALSE], y = y[ind], weights =
                         weights[ind], family = family, lambda = lambda, penwt =
                         penwt, method = method, penwt.method = penwt.method,
+                        penalize.linear = penalize.linear,
+                        which.linear = which.linear,
                         nfolds = nfolds, scad.maxit = scad.maxit, pb = pb, i = i)
         }
     }
