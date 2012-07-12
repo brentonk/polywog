@@ -325,6 +325,8 @@ polywog <- function(formula, data, subset, weights, na.action,
                 # (6)
                 varNames = varNames,
                 call = cl)
+    if (method != "none" && family == "binomial")
+        ans$fitted.values <- plogis(ans$fitted.values)
     class(ans) <- "polywog"
     if (model)
         ans$model <- mf

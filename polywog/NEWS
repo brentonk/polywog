@@ -15,6 +15,13 @@ polywog 0.2-1 (2012-07-XX)
 * bootPolywog() now has argument 'maxtries' to control failure when a
   non-collinear bootstrap model matrix cannot be found
 
+* The 'fitted.values' element of "polywog" objects is now on the response scale
+  instead of the link scale (i.e., transformed to probabilities when family =
+  "binomial")
+
+* Fixed bug where the 'polywog.fit' element of cv.polywog() output would not
+  contain fitted values
+
 * Fixed bug that sometimes caused predVals() to fail unexpectedly
 
 

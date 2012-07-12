@@ -124,13 +124,21 @@ cv.polywog <- function(formula,
     ## computational speedup.
     polywog.fit <- calls[[best]]
     polywog.fit$model <- model
-    polywog.fit$X <- X
+    polywog.fit$X <- TRUE  # to make fitted values
     polywog.fit$y <- y
     polywog.fit$model <- model
     polywog.fit$degree <- degrees.cv[best]
     polywog.fit <- eval(polywog.fit, parent.frame())
     polywog.fit$coefficients <- ans[[best]]$coef
     polywog.fit$lambda <- ans[[best]]$lambda
+    polywog.fit$fitted.values <-
+        drop(cbind(1L, polywog.fit$X) %*% ans[[best]]$coef)
+    if (polywog.fit$family == "binomial")
+        polywog.fit$fitted.values <- plogis(polywog.fit$fitted.values)
+    if (!X) {
+        polywog.fit$X <- NULL
+        polywog.fit$call$X <- FALSE
+    }
     polywog.fit$method <- method
     polywog.fit$call$method <- method
     if (method == "scad") {
