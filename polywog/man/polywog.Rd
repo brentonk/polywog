@@ -5,7 +5,8 @@
   polywog(formula, data, subset, weights, na.action,
     degree = 3, family = c("gaussian", "binomial"),
     method = c("alasso", "scad", "none"),
-    penwt.method = c("lm", "glm"), boot = 0,
+    penwt.method = c("lm", "glm"),
+    unpenalized = character(0), boot = 0,
     control.boot = control.bp(), .parallel = FALSE,
     model = TRUE, X = FALSE, y = FALSE, nfolds = 10,
     scad.maxit = 5000)
@@ -43,6 +44,10 @@
   estimates in logistic models when \code{method =
   "alasso"}: \code{"lm"} (default) for a linear probability
   model, \code{"glm"} for logistic regression.}
+
+  \item{unpenalized}{names of model terms to be exempt from
+  the adaptive penalty (only available when \code{model =
+  "alasso"}).}
 
   \item{boot}{number of bootstrap iterations (0 for no
   bootstrapping).}
@@ -98,11 +103,13 @@
   \item{\code{penwt.method}}{estimator for penalty weights
   in adaptive LASSO models, \code{"lm"} or \code{"glm"}; is
   \code{NULL} if \code{method = "scad"}.}
-  \item{\code{nfolds}}{number of cross-validation folds.}
-  \item{\code{terms}}{the \code{\link{terms}} object used
-  in fitting.} \item{\code{pivot}}{indices of the
-  non-collinear columns of the full basis expansion of the
-  input variables.} \item{\code{nobs}}{number of
+  \item{\code{unpenalized}}{columns of the model matrix
+  (not including intercept) to be exempt from the adaptive
+  penalty.} \item{\code{nfolds}}{number of cross-validation
+  folds.} \item{\code{terms}}{the \code{\link{terms}}
+  object used in fitting.} \item{\code{pivot}}{indices of
+  the non-collinear columns of the full basis expansion of
+  the input variables.} \item{\code{nobs}}{number of
   observations used in fitting.}
   \item{\code{na.action}}{information on how \code{NA}s in
   the input data were handled.}

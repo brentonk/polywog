@@ -9,8 +9,11 @@
 polywog 0.2-1 (2012-07-XX)
 --------------------------
 
-* bootPolywog() now has argument maxtries to control failure when a non-collinear
-  bootstrap model matrix cannot be found
+* polywog() now has argument 'unpenalized' to exclude some terms from the
+  adaptive LASSO penalty
+
+* bootPolywog() now has argument 'maxtries' to control failure when a
+  non-collinear bootstrap model matrix cannot be found
 
 * Fixed bug that sometimes caused predVals() to fail unexpectedly
 
