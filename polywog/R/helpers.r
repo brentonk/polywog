@@ -71,10 +71,7 @@ makeX <- function(formula, mf, degree, na.ok = FALSE)
                     cbind(matrix(0, nrow = nlin, ncol = ncol(pt1)), diag(nlin)))
         colnames(pt) <- c(colnames(pt1), colnames(Xlin))
         attr(X, "polyTerms") <- pt
-    } else {
-        nlin <- 0
     }
-    attr(X, "which.linear") <- rev(seq_len(ncol(X)))[seq_len(nlin)]
 
     return(X)
 }
