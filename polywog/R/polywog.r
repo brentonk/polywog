@@ -10,8 +10,11 @@ NULL
 ##' (\email{brenton.kenkel@@gmail.com}), with bug reports or feature requests.
 ##' @name polywog-package
 ##' @docType package
-##' @section Acknowledgements: We thank the Wallis Institute of Political
-##' Economy for financial support.
+##' @section Acknowledgements: We are grateful to Tyson Chatangier for many
+##' helpful suggestions about an earlier version of the package.  We also thank
+##' the Wallis Institute of Political Economy and the Theory and Statistics
+##' Research Lab at the University of Rochester for financial support during the
+##' writing of the package.
 ##' @references
 ##' Brenton Kenkel and Curtis S. Signorino.  2012.  "A Method for Flexible
 ##' Functional Form Estimation: Bootstrapped Basis Regression with Variable
@@ -364,7 +367,8 @@ polywog <- function(formula, data, subset, weights, na.action,
 ##' @author Brenton Kenkel and Curtis S. Signorino
 ##' @export
 control.bp <- function(reuse.lambda = FALSE, reuse.penwt = FALSE,
-                       maxtries = 1000, report = FALSE, scad.maxit = 5000)
+                       maxtries = 1000, min.prop = 0, report = FALSE,
+                       scad.maxit = 5000)
 {
     list(reuse.lambda = reuse.lambda, reuse.penwt = reuse.penwt,
          maxtries = maxtries, report = report, scad.maxit = scad.maxit)
@@ -428,6 +432,10 @@ bootFit <- function(X, y, weights, family, lambda, penwt, method, penwt.method,
 ##' @param maxtries maximum number of attempts to generate a bootstrap sample
 ##' with a non-collinear model matrix (often problematic with lopsided binary
 ##' regressors) before failing.
+##' @param min.prop for models with a binary response, minimum proportion of
+##' non-modal outcome to ensure is included in each bootstrap iteration (for
+##' example, set \code{min.prop = 0.1} to throw out any bootstrap iteration
+##' where less than 10 percent of the responses are 1's)
 ##' @param report logical: whether to print a status bar.  Not available if
 ##' \code{.parallel = TRUE}.
 ##' @param scad.maxit maximum number of iterations for \code{\link{ncvreg}} in
@@ -476,7 +484,8 @@ bootFit <- function(X, y, weights, family, lambda, penwt, method, penwt.method,
 ##' stopWorkers(w)
 ##' }
 bootPolywog <- function(model, nboot = 100, reuse.lambda = FALSE,
-                        reuse.penwt = FALSE, maxtries = 1000, report = FALSE,
+                        reuse.penwt = FALSE, maxtries = 1000, min.prop = 0,
+                        report = FALSE,
                         scad.maxit = 5000,
                         .parallel = FALSE, .matrixOnly = FALSE)
 {
@@ -524,6 +533,7 @@ bootPolywog <- function(model, nboot = 100, reuse.lambda = FALSE,
             stop("Fitted object must contain either 'model' or both 'X' and 'y'; re-run polywog with \"model = TRUE\"")
         y <- model.part(formula, model$model, lhs = 1, drop = TRUE)
     }
+    isBinary <- length(unique(y)) <= 2
 
     ## Bootstrap iterations
     pb <- if (report) txtProgressBar(min = 0, max = nboot) else NULL
@@ -540,7 +550,10 @@ bootPolywog <- function(model, nboot = 100, reuse.lambda = FALSE,
                 if (tries > maxtries)
                     stop("'maxtries' reached; no non-collinear bootstrap sample found")
                 ind <- sample(seq_len(nobs), nobs, replace = TRUE)
-                if (qr(cbind(1L, X[ind, , drop = FALSE]))$rank == ncf)
+                Xgood <- qr(cbind(1L, X[ind, , drop = FALSE]))$rank == ncf
+                ygood <- !isBinary || (mean(y[ind]) > min.prop &&
+                                       mean(1-y[ind]) > min.prop)
+                if (Xgood && ygood)
                     break
             }
             polywog:::bootFit(X = X[ind, , drop = FALSE], y = y[ind], weights =

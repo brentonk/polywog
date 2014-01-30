@@ -12,8 +12,12 @@
   feature requests.
 }
 \section{Acknowledgements}{
-  We thank the Wallis Institute of Political Economy for
-  financial support.
+  We are grateful to Tyson Chatangier for many helpful
+  suggestions about an earlier version of the package.  We
+  also thank the Wallis Institute of Political Economy and
+  the Theory and Statistics Research Lab at the University
+  of Rochester for financial support during the writing of
+  the package.
 }
 \references{
   Brenton Kenkel and Curtis S. Signorino.  2012.  "A Method
