@@ -176,3 +176,58 @@ predValsR <- function(model, data = model$model,
     ans
 }
 
+predValsC <- function(model, data = model$model,
+                      xvars, xlims = list(), n = 50,
+                      interval = TRUE, level = .95,
+                      report = FALSE, .parallel = FALSE)
+{
+    ## Can't form a confidence interval if no bootstrap results
+    if (is.null(model$boot.matrix) && interval) {
+        interval <- FALSE
+        warning("Option 'interval' not available for models without a 'boot.matrix' element")
+    }
+
+    ## Can't print a status bar in parallel
+    if (.parallel)
+        report <- FALSE
+
+    ## Calculate grid of covariate values to examine
+    xc <- polywog:::getXcols(xvars, names(data))
+    xv <- polywog:::getXvals(data, xc, xlims, n)
+
+    ## Store the model formula
+    ff <- polywog:::removeIntercepts(model$formula, data)
+
+    ## Loop through the grid of covariate values
+    `%dofn%` <- if (.parallel) `%dopar%` else `%do%`
+    if (report)
+        pb <- txtProgressBar(min = 0, max = nrow(xv))
+    ans <- foreach (i = seq_len(nrow(xv))) %dofn% {
+        ## Replace the actual values of the selected covariates in the data
+        ## with the i'th row of the grid, while keeping everything else at its
+        ## true values
+        data[, names(xv)] <- xv[i, ]
+
+        ## Create the model matrix
+        X <- model.matrix(ff, data = data, rhs = 1)
+        if (length(ff)[2] > 1)
+            X <- cbind(X, model.matrix(ff, data = data, rhs = 2))
+
+        pred <- newPredictPolywogC(X = X, poly_terms = model$polyTerms,
+                                   coef = list(main = coef(model),
+                                   boot = t(model$boot.matrix)),
+                                   avg = TRUE, interval = FALSE, level = level)
+
+        if (report)
+            setTxtProgressBar(pb, i)
+
+        unlist(pred)
+    }
+    ans <- do.call(rbind, ans)
+    ans <- data.frame(cbind(xv, ans))
+
+    if (!interval)
+        ans$lwr <- ans$upr <- NULL
+
+    ans
+}
