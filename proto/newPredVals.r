@@ -7,15 +7,14 @@
 ### package.
 ###
 ### Brenton Kenkel and Curt Signorino
-### last updated 2013-01-14 (bjk)
 ##############################################################################
 
 library(foreach)
 
-newPredVals <- function(model, data = model$model,
-                        xvars, xlims = list(), n = 50,
-                        interval = TRUE, level = .95,
-                        report = FALSE, .parallel = FALSE)
+predValsR <- function(model, data = model$model,
+                      xvars, xlims = list(), n = 50,
+                      interval = TRUE, level = .95,
+                      report = FALSE, .parallel = FALSE)
 {
     ## Can't form a confidence interval if no bootstrap results
     if (is.null(model$boot.matrix) && interval) {
