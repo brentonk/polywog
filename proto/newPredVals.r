@@ -10,6 +10,100 @@
 ##############################################################################
 
 library(foreach)
+library(Rcpp)
+
+sourceCpp("newPredVals.cpp")
+
+newPredict <- function(object, newdata,
+                       type = c("link", "response"),
+                       interval = FALSE, level = .95,
+                       bag = FALSE,
+                       na.action = na.pass, ...)
+{
+    ## TODO:
+    ##   o Implement bootstrap aggregation
+    ##   o Implement response transformation for logit
+    ##   o See whether the "nd.is.mf" check is necessary
+
+    type <- match.arg(type)
+    transform <- (type == "response" && object$family == "binomial")
+
+    ## Check for nothing that depends on bootstrap results if 'object' does
+    ## not have a 'boot.matrix' element
+    if (is.null(object$boot.matrix) && (interval || bag))
+    {
+        interval <- bag <- FALSE
+        warning("Options 'interval' and 'bag' not available for models without a 'boot.matrix' element")
+    }
+
+    ## Setup largely adapted from predict.lm() code; the bits relating to
+    ## 'newdata' being a model frame are adapted from mgcv::predict.gam()
+    X.exists <- FALSE
+    if (missing(newdata) || is.null(newdata)) {
+        ## Use original model matrix if available
+        X <- object$X
+        if (is.null(X)) {
+            if (is.null(object$model))
+                stop("Fitted object must contain either 'model' or 'X' to use predict.polywog without specifying 'newdata'; re-run polywog with \"model = TRUE\"")
+            mf <- object$model
+        } else {
+            X.exists <- TRUE
+        }
+        nd.is.mf <- FALSE
+    } else if (is.data.frame(newdata) && !is.null(attr(newdata, "terms"))) {
+        ## 'newdata' is a model frame -- this case must be treated separately,
+        ## or else predVals() and margEff.polywog() won't work when the
+        ## original model formula contains transformations of the original
+        ## inputs
+
+        mf <- newdata
+        nd.is.mf <- TRUE
+    } else {
+        ## Construct model frame from 'newdata'
+        Terms <- delete.response(terms(object))
+        mf <- model.frame(Terms, newdata, na.action = na.action, xlev =
+                          object$xlevels)
+
+        ## Check validity of 'newdata' (covariate types same as in fitted
+        ## model)
+        if (!is.null(cl <- attr(Terms, "dataClasses")))
+            .checkMFClasses(cl, mf)
+
+        nd.is.mf <- FALSE
+    }
+
+    ## Compute the model matrix
+    if (!X.exists) {
+        ff <- polywog:::removeIntercepts(object$formula, mf)
+        X <- model.matrix(ff, data = mf, rhs = 1)
+        if (length(object$formula)[2] > 1)
+            X <- cbind(X, model.matrix(ff, data = mf, rhs = 2))
+    }
+
+    pred <- newPredictPolywogC(X = X, poly_terms = object$polyTerms,
+                               coef = list(main = coef(object),
+                               boot = if (interval) t(object$boot.matrix)),
+                               avg = FALSE, interval = interval,
+                               level = level)
+    if (interval) {
+        pred <- do.call(cbind, pred)
+    } else {
+        pred <- pred$pred
+    }
+
+    ## If just computing in-sample fits, ensure conformity with the original
+    ## 'na.action' (i.e. padding when na.action = na.exclude, as in
+    ## 'predict.lm')
+    if (missing(newdata) || is.null(newdata)) {
+        pred <- napredict(object$na.action, pred)
+    } else if (nd.is.mf) {
+        pred <- napredict(attr(newdata, "na.action"), pred)
+    } else {
+        pred <- napredict(attr(mf, "na.action"), pred)
+    }
+
+    pred
+}
 
 predValsR <- function(model, data = model$model,
                       xvars, xlims = list(), n = 50,
