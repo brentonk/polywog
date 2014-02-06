@@ -100,7 +100,6 @@ List newPredictPolywogC(NumericMatrix X,
         probs[1] = 1 - probs[0];
     }
 
-
     // Loop over each row (observation) in X
     for (int i = 0; i < n_obs; i++) {
         // Calculate predicted values from the main model fit
@@ -118,7 +117,7 @@ List newPredictPolywogC(NumericMatrix X,
                 NumericVector coef_boot = columnFromSparse(boot_matrix, j);
 
                 if (avg) {
-                    fit_boot[j] += sum(x_row_poly * coef_boot) / n_boot;
+                    fit_boot[j] += sum(x_row_poly * coef_boot) / n_obs;
                 } else {
                     fit_boot[j] = sum(x_row_poly * coef_boot);
                 }
