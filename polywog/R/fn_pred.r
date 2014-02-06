@@ -67,7 +67,6 @@ predict.polywog <- function(object, newdata,
 
     ## Setup largely adapted from predict.lm() code; the bits relating to
     ## 'newdata' being a model frame are adapted from mgcv::predict.gam()
-    tt <- terms(object)
     if (missing(newdata) || is.null(newdata)) {
         ## Use original model matrix if available
         X <- object$X
@@ -80,23 +79,26 @@ predict.polywog <- function(object, newdata,
         nd.is.mf <- FALSE
     } else if (is.data.frame(newdata) && !is.null(attr(newdata, "terms"))) {
         ## 'newdata' is a model frame -- this case must be treated separately,
-        ## or else predVals() and margEff.polywog() won't work when the original
-        ## model formula contains transformations of the original inputs
+        ## or else predVals() and margEff.polywog() won't work when the
+        ## original model formula contains transformations of the original
+        ## inputs
 
         X <- makeX(object$formula, newdata, object$degree, na.ok = TRUE)
         X <- X[, object$pivot, drop = FALSE]
         nd.is.mf <- TRUE
     } else {
         ## Construct model frame from 'newdata'
-        Terms <- delete.response(tt)
+        Terms <- delete.response(terms(object))
         mf <- model.frame(Terms, newdata, na.action = na.action, xlev =
                           object$xlevels)
 
-        ## Check validity of 'newdata' (covariate types same as in fitted model)
+        ## Check validity of 'newdata' (covariate types same as in fitted
+        ## model)
         if (!is.null(cl <- attr(Terms, "dataClasses")))
             .checkMFClasses(cl, mf)
 
-        ## Construct polynomial-expanded model matrix and remove collinear terms
+        ## Construct polynomial-expanded model matrix and remove collinear
+        ## terms
         X <- makeX(object$formula, mf, object$degree, na.ok = TRUE)
         X <- X[, object$pivot, drop = FALSE]
         nd.is.mf <- FALSE
