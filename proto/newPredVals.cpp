@@ -66,6 +66,9 @@ List newPredictPolywogC(NumericMatrix X,
                         bool interval,
                         double level)
 {
+    // TODO:
+    //   o Implement NA handling when "quantile" is called
+
     // Storage for final output
     //
     // avg -> just a single average and its confidence interval
