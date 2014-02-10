@@ -2,14 +2,11 @@
 \alias{polywog}
 \title{Polynomial regression with oracle variable selection}
 \usage{
-  polywog(formula, data, subset, weights, na.action,
-    degree = 3, family = c("gaussian", "binomial"),
-    method = c("alasso", "scad", "none"),
-    penwt.method = c("lm", "glm"),
-    unpenalized = character(0), boot = 0,
-    control.boot = control.bp(), .parallel = FALSE,
-    model = TRUE, X = FALSE, y = FALSE, nfolds = 10,
-    scad.maxit = 5000)
+polywog(formula, data, subset, weights, na.action, degree = 3,
+  family = c("gaussian", "binomial"), method = c("alasso", "scad", "none"),
+  penwt.method = c("lm", "glm"), unpenalized = character(0), boot = 0,
+  control.boot = control.bp(), .parallel = FALSE, model = TRUE,
+  X = FALSE, y = FALSE, nfolds = 10, scad.maxit = 5000)
 }
 \arguments{
   \item{formula}{model formula specifying the response and
@@ -83,95 +80,86 @@
   ignored when \code{method = "alasso"}.}
 }
 \value{
-  An object of class \code{"polywog"}, a list containing:
-  \describe{ \item{\code{coefficients}}{the estimated
-  coefficients.} \item{\code{lambda}}{the penalization
-  parameter selected by cross-validation.}
-  \item{\code{fitted.values}}{the fitted mean values for
-  each observation used in fitting.}
-  \item{\code{lmcoef}}{coefficients from an unpenalized
-  least-squares regression.} \item{\code{penwt}}{penalty
-  weights if \code{method = "alasso"}, \code{NULL}
-  otherwise.} \item{\code{formula}}{model formula.}
-  \item{\code{degree}}{degree of polynomial basis
-  expansion.} \item{\code{family}}{model family,
-  \code{"gaussian"} or \code{"binomial"}.}
-  \item{\code{weights}}{observation weights if specified,
-  \code{NULL} otherwise.}
-  \item{\code{method}}{regularization method,
-  \code{"alasso"} or \code{"scad"}.}
-  \item{\code{penwt.method}}{estimator for penalty weights
-  in adaptive LASSO models, \code{"lm"} or \code{"glm"}; is
-  \code{NULL} if \code{method = "scad"}.}
-  \item{\code{unpenalized}}{columns of the model matrix
-  (not including intercept) to be exempt from the adaptive
-  penalty.} \item{\code{nfolds}}{number of cross-validation
-  folds.} \item{\code{terms}}{the \code{\link{terms}}
-  object used in fitting.} \item{\code{pivot}}{indices of
-  the non-collinear columns of the full basis expansion of
-  the input variables.} \item{\code{nobs}}{number of
-  observations used in fitting.}
-  \item{\code{na.action}}{information on how \code{NA}s in
-  the input data were handled.}
-  \item{\code{xlevels}}{levels of factor variables used in
-  fitting.} \item{\code{polyTerms}}{a matrix recording how
-  many powers of each raw input term are represented in
-  each column of the design matrix.}
-  \item{\code{varNames}}{names of the raw input variables
-  included in the model.} \item{\code{call}}{the original
-  function call.} \item{\code{model}}{(if requested) the
-  model frame (see \code{\link{model.frame}}).}
-  \item{\code{X}}{(if requested) the basis-expanded design
-  matrix.} \item{\code{y}}{(if requested) the response
-  variable.} \item{\code{boot.matrix}}{(if \code{boot > 0})
-  a sparse matrix of class
-  \code{"\link[=dgCMatrix-class]{dgCMatrix}"} containing
-  bootstrap coefficients (see \code{\link{bootPolywog}}).}
-  }
+An object of class \code{"polywog"}, a list containing:
+\describe{ \item{\code{coefficients}}{the estimated
+coefficients.} \item{\code{lambda}}{the penalization
+parameter selected by cross-validation.}
+\item{\code{fitted.values}}{the fitted mean values for each
+observation used in fitting.}
+\item{\code{lmcoef}}{coefficients from an unpenalized
+least-squares regression.} \item{\code{penwt}}{penalty
+weights if \code{method = "alasso"}, \code{NULL}
+otherwise.} \item{\code{formula}}{model formula.}
+\item{\code{degree}}{degree of polynomial basis expansion.}
+\item{\code{family}}{model family, \code{"gaussian"} or
+\code{"binomial"}.} \item{\code{weights}}{observation
+weights if specified, \code{NULL} otherwise.}
+\item{\code{method}}{regularization method, \code{"alasso"}
+or \code{"scad"}.} \item{\code{penwt.method}}{estimator for
+penalty weights in adaptive LASSO models, \code{"lm"} or
+\code{"glm"}; is \code{NULL} if \code{method = "scad"}.}
+\item{\code{unpenalized}}{columns of the model matrix (not
+including intercept) to be exempt from the adaptive
+penalty.} \item{\code{nfolds}}{number of cross-validation
+folds.} \item{\code{terms}}{the \code{\link{terms}} object
+used in fitting.} \item{\code{pivot}}{indices of the
+non-collinear columns of the full basis expansion of the
+input variables.} \item{\code{nobs}}{number of observations
+used in fitting.} \item{\code{na.action}}{information on
+how \code{NA}s in the input data were handled.}
+\item{\code{xlevels}}{levels of factor variables used in
+fitting.} \item{\code{polyTerms}}{a matrix recording how
+many powers of each raw input term are represented in each
+column of the design matrix.} \item{\code{varNames}}{names
+of the raw input variables included in the model.}
+\item{\code{call}}{the original function call.}
+\item{\code{model}}{(if requested) the model frame (see
+\code{\link{model.frame}}).} \item{\code{X}}{(if requested)
+the basis-expanded design matrix.} \item{\code{y}}{(if
+requested) the response variable.}
+\item{\code{boot.matrix}}{(if \code{boot > 0}) a sparse
+matrix of class \code{"\link[=dgCMatrix-class]{dgCMatrix}"}
+containing bootstrap coefficients (see
+\code{\link{bootPolywog}}).} }
 }
 \description{
-  Fits a regression model using a polynomial basis
-  expansion of the input variables, with penalization via
-  the adaptive LASSO or SCAD to provide oracle variable
-  selection.
+Fits a regression model using a polynomial basis expansion
+of the input variables, with penalization via the adaptive
+LASSO or SCAD to provide oracle variable selection.
 }
 \details{
-  The design matrix for the regression is a polynomial
-  basis expansion of the matrix of raw input variables.
-  This includes all powers and interactions of the input
-  variables up to the specified \code{degree}.  For
-  example, the following terms will be included in
-  \code{polywog(y ~ x1 + x2, degree = 3, ...)}: \itemize{
-  \item terms of degree 0: intercept \item terms of degree
-  1: \code{x1}, \code{x2} \item terms of degree 2:
-  \code{x1^2}, \code{x2^2}, \code{x1*x2} \item terms of
-  degree 3: \code{x1^3}, \code{x2^3}, \code{x1*x2^2},
-  \code{x1^2*x2} } To exclude certain terms from the basis
-  expansion, use a model formula like \code{y ~ x1 + x2 |
-  z1 + z2}.  Only the degree 1 terms of \code{z1} and
-  \code{z2} will be included.
+The design matrix for the regression is a polynomial basis
+expansion of the matrix of raw input variables.  This
+includes all powers and interactions of the input variables
+up to the specified \code{degree}.  For example, the
+following terms will be included in \code{polywog(y ~ x1 +
+x2, degree = 3, ...)}: \itemize{ \item terms of degree 0:
+intercept \item terms of degree 1: \code{x1}, \code{x2}
+\item terms of degree 2: \code{x1^2}, \code{x2^2},
+\code{x1*x2} \item terms of degree 3: \code{x1^3},
+\code{x2^3}, \code{x1*x2^2}, \code{x1^2*x2} } To exclude
+certain terms from the basis expansion, use a model formula
+like \code{y ~ x1 + x2 | z1 + z2}.  Only the degree 1 terms
+of \code{z1} and \code{z2} will be included.
 
-  It is possible that the "raw" basis expansion will be
-  rank-deficient, such as if there are binary input
-  variables (in which case \eqn{x_i = x_i^n} for all \eqn{n
-  > 0}).  The procedure detects collinearity via
-  \code{\link{qr}} and removes extraneous columns before
-  fitting.
+It is possible that the "raw" basis expansion will be
+rank-deficient, such as if there are binary input variables
+(in which case \eqn{x_i = x_i^n} for all \eqn{n > 0}).  The
+procedure detects collinearity via \code{\link{qr}} and
+removes extraneous columns before fitting.
 
-  For both the adaptive LASSO and SCAD, the penalization
-  factor \eqn{\lambda} is chosen by k-fold
-  cross-validation.  The selected value minimizes the
-  average mean squared error of out-of-sample fits.  (To
-  select both \eqn{\lambda} and the polynomial degree
-  simultaneously via cross-validation, see
-  \code{\link{cv.polywog}}.)
+For both the adaptive LASSO and SCAD, the penalization
+factor \eqn{\lambda} is chosen by k-fold cross-validation.
+The selected value minimizes the average mean squared error
+of out-of-sample fits.  (To select both \eqn{\lambda} and
+the polynomial degree simultaneously via cross-validation,
+see \code{\link{cv.polywog}}.)
 
-  The bootstrap iterations may be run in parallel via
-  \code{\link[foreach]{foreach}} by registering an
-  appropriate backend and specifying \code{.parallel =
-  TRUE}.  For more information on parallel processing, see
-  the documentation and examples for
-  \code{\link{bootPolywog}}.
+The bootstrap iterations may be run in parallel via
+\code{\link[foreach]{foreach}} by registering an
+appropriate backend and specifying \code{.parallel = TRUE}.
+For more information on parallel processing, see the
+documentation and examples for \code{\link{bootPolywog}}.
 }
 \examples{
 ## Using occupational prestige data
@@ -198,30 +186,30 @@ fit2 <- update(fit1, method = "scad")
 cbind(coef(fit1), coef(fit2))
 }
 \author{
-  Brenton Kenkel and Curtis S. Signorino
+Brenton Kenkel and Curtis S. Signorino
 }
 \references{
-  Brenton Kenkel and Curtis S. Signorino.  2012.  "A Method
-  for Flexible Functional Form Estimation: Bootstrapped
-  Basis Regression with Variable Selection."  Typescript,
-  University of Rochester.
+Brenton Kenkel and Curtis S. Signorino.  2012.  "A Method
+for Flexible Functional Form Estimation: Bootstrapped Basis
+Regression with Variable Selection."  Typescript,
+University of Rochester.
 }
 \seealso{
-  To estimate variation via the bootstrap, see
-  \code{\link{bootPolywog}}.  To generate fitted values,
-  see \code{\link{predVals}} (and the underlying method
-  \code{\link{predict.polywog}}).  For plots, see
-  \code{\link{plot.polywog}}. The polynomial degree may be
-  selected via cross-validation using
-  \code{\link{cv.polywog}}.
+To estimate variation via the bootstrap, see
+\code{\link{bootPolywog}}.  To generate fitted values, see
+\code{\link{predVals}} (and the underlying method
+\code{\link{predict.polywog}}).  For plots, see
+\code{\link{plot.polywog}}. The polynomial degree may be
+selected via cross-validation using
+\code{\link{cv.polywog}}.
 
-  Polynomial basis expansions of matrix inputs are computed
-  with \code{\link{polym2}}.
+Polynomial basis expansions of matrix inputs are computed
+with \code{\link{polym2}}.
 
-  Adaptive LASSO estimates are provided via
-  \code{\link{glmnet}} and \code{\link{cv.glmnet}} from the
-  \pkg{glmnet} package.  SCAD estimates are via
-  \code{\link{cv.ncvreg}} and \code{\link{ncvreg}} in the
-  \pkg{ncvreg} package.
+Adaptive LASSO estimates are provided via
+\code{\link{glmnet}} and \code{\link{cv.glmnet}} from the
+\pkg{glmnet} package.  SCAD estimates are via
+\code{\link{cv.ncvreg}} and \code{\link{ncvreg}} in the
+\pkg{ncvreg} package.
 }
 

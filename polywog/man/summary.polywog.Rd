@@ -2,8 +2,7 @@
 \alias{summary.polywog}
 \title{Summarize a fitted polywog model}
 \usage{
-  \method{summary}{polywog} (object, level = 0.95,
-    prop0 = FALSE, ...)
+\method{summary}{polywog}(object, level = 0.95, prop0 = FALSE, ...)
 }
 \arguments{
   \item{object}{a fitted model of class \code{"polywog"},
@@ -20,21 +19,19 @@
   \item{...}{other arguments, currently ignored.}
 }
 \value{
-  An object of class \code{"summary.polywog"} whose
-  elements are the "regression table" (\code{coefficients})
-  and additional information from the original fitted
-  model.
+An object of class \code{"summary.polywog"} whose elements
+are the "regression table" (\code{coefficients}) and
+additional information from the original fitted model.
 }
 \description{
-  Generates a "regression table" to summarize the fitted
-  model, including coefficients along with their
-  bootstrapped standard errors and confidence intervals.
-  If the fitted model does not have a \code{boot.matrix}
-  element, the output will contain \code{NA}s for the
-  standard errors, and confidence intervals will not be
-  displayed.
+Generates a "regression table" to summarize the fitted
+model, including coefficients along with their bootstrapped
+standard errors and confidence intervals.  If the fitted
+model does not have a \code{boot.matrix} element, the
+output will contain \code{NA}s for the standard errors, and
+confidence intervals will not be displayed.
 }
 \author{
-  Brenton Kenkel and Curtis S. Signorino
+Brenton Kenkel and Curtis S. Signorino
 }
 

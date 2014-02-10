@@ -2,10 +2,9 @@
 \alias{bootPolywog}
 \title{Bootstrap a fitted polywog model}
 \usage{
-  bootPolywog(model, nboot = 100, reuse.lambda = FALSE,
-    reuse.penwt = FALSE, maxtries = 1000, min.prop = 0,
-    report = FALSE, scad.maxit = 5000, .parallel = FALSE,
-    .matrixOnly = FALSE)
+bootPolywog(model, nboot = 100, reuse.lambda = FALSE, reuse.penwt = FALSE,
+  maxtries = 1000, min.prop = 0, report = FALSE, scad.maxit = 5000,
+  .parallel = FALSE, .matrixOnly = FALSE)
 }
 \arguments{
   \item{model}{a fitted model of class \code{"polywog"},
@@ -51,31 +50,31 @@
   the \code{boot.matrix} element (\code{FALSE}, default).}
 }
 \value{
-  If \code{.matrixOnly = FALSE}, the returned object is
-  \code{model} with the bootstrap matrix included as its
-  \code{boot.matrix} element.  If \code{.matrixOnly =
-  TRUE}, just the matrix is returned.  In either case, the
-  bootstrap matrix is a sparse matrix of class
-  \code{"\link[=dgCMatrix-class]{dgCMatrix}"}.
+If \code{.matrixOnly = FALSE}, the returned object is
+\code{model} with the bootstrap matrix included as its
+\code{boot.matrix} element.  If \code{.matrixOnly = TRUE},
+just the matrix is returned.  In either case, the bootstrap
+matrix is a sparse matrix of class
+\code{"\link[=dgCMatrix-class]{dgCMatrix}"}.
 }
 \description{
-  Nonparametric bootstrap of the \code{\link{polywog}}
-  regression procedure. Can be run on a fitted model of
-  class \code{"polywog"}, or within the original procedure
-  via the \code{boot} argument.
+Nonparametric bootstrap of the \code{\link{polywog}}
+regression procedure. Can be run on a fitted model of class
+\code{"polywog"}, or within the original procedure via the
+\code{boot} argument.
 }
 \details{
-  When \code{.parallel = TRUE}, parallel computation is
-  performed via \code{\link[foreach:foreach]{\%dopar\%}}
-  using the currently registered backend.  Typically this
-  will be \pkg{doMC} on Mac/Unix, \pkg{doSMP} on Windows,
-  and \pkg{doSNOW} in cluster environments.  Users must
-  load the appropriate packages and register the parallel
-  environment before calling \code{bootPolywog} (or
-  \code{\link{polywog}} with \code{boot > 0}).  If a
-  parallel backend is not registered but \code{.parallel =
-  TRUE}, computation will proceed sequentially and
-  \code{\%dopar\%} will issue a warning.
+When \code{.parallel = TRUE}, parallel computation is
+performed via \code{\link[foreach:foreach]{\%dopar\%}}
+using the currently registered backend.  Typically this
+will be \pkg{doMC} on Mac/Unix, \pkg{doSMP} on Windows, and
+\pkg{doSNOW} in cluster environments.  Users must load the
+appropriate packages and register the parallel environment
+before calling \code{bootPolywog} (or \code{\link{polywog}}
+with \code{boot > 0}).  If a parallel backend is not
+registered but \code{.parallel = TRUE}, computation will
+proceed sequentially and \code{\%dopar\%} will issue a
+warning.
 }
 \examples{
 ## Using occupational prestige data
@@ -110,6 +109,6 @@ stopWorkers(w)
 }
 }
 \author{
-  Brenton Kenkel and Curtis S. Signorino
+Brenton Kenkel and Curtis S. Signorino
 }
 

@@ -2,9 +2,8 @@
 \alias{control.bp}
 \title{Auxiliary for bootstrap options}
 \usage{
-  control.bp(reuse.lambda = FALSE, reuse.penwt = FALSE,
-    maxtries = 1000, min.prop = 0, report = FALSE,
-    scad.maxit = 5000)
+control.bp(reuse.lambda = FALSE, reuse.penwt = FALSE, maxtries = 1000,
+  min.prop = 0, report = FALSE, scad.maxit = 5000)
 }
 \arguments{
   \item{reuse.lambda}{logical: whether to use the
@@ -36,14 +35,14 @@
   \code{\link{ncvreg}} in SCAD models.}
 }
 \value{
-  A list containing the function arguments.
+A list containing the function arguments.
 }
 \description{
-  Used to pass options to \code{\link{bootPolywog}} when
-  bootstrapping via the \code{boot} option of the main
-  \code{\link{polywog}} function.
+Used to pass options to \code{\link{bootPolywog}} when
+bootstrapping via the \code{boot} option of the main
+\code{\link{polywog}} function.
 }
 \author{
-  Brenton Kenkel and Curtis S. Signorino
+Brenton Kenkel and Curtis S. Signorino
 }
 
