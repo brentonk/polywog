@@ -1,5 +1,7 @@
 ##' @include helpers.r
 ##' @include fitters.r
+##' @useDynLib polywog
+##' @importFrom Rcpp sourceCpp
 NULL
 
 ##' Bootstrapped basis regression with oracle model selection

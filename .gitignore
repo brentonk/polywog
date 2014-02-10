@@ -1,2 +1,6 @@
 # Package builds
 *.tar.gz
+
+# Rcpp object files
+polywog/src/*.o
+polywog/src/*.so
