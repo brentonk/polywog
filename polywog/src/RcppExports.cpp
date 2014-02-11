@@ -5,9 +5,9 @@
 
 using namespace Rcpp;
 
-// newPredictPolywogC
-List newPredictPolywogC(NumericMatrix X, IntegerMatrix poly_terms, List coef, bool avg, bool interval, double level);
-RcppExport SEXP polywog_newPredictPolywogC(SEXP XSEXP, SEXP poly_termsSEXP, SEXP coefSEXP, SEXP avgSEXP, SEXP intervalSEXP, SEXP levelSEXP) {
+// computePredict
+List computePredict(NumericMatrix X, IntegerMatrix poly_terms, List coef, bool forPredVals, bool interval, bool bag, double level);
+RcppExport SEXP polywog_computePredict(SEXP XSEXP, SEXP poly_termsSEXP, SEXP coefSEXP, SEXP forPredValsSEXP, SEXP intervalSEXP, SEXP bagSEXP, SEXP levelSEXP) {
 BEGIN_RCPP
     SEXP __sexp_result;
     {
@@ -15,10 +15,11 @@ BEGIN_RCPP
         Rcpp::traits::input_parameter< NumericMatrix >::type X(XSEXP );
         Rcpp::traits::input_parameter< IntegerMatrix >::type poly_terms(poly_termsSEXP );
         Rcpp::traits::input_parameter< List >::type coef(coefSEXP );
-        Rcpp::traits::input_parameter< bool >::type avg(avgSEXP );
+        Rcpp::traits::input_parameter< bool >::type forPredVals(forPredValsSEXP );
         Rcpp::traits::input_parameter< bool >::type interval(intervalSEXP );
+        Rcpp::traits::input_parameter< bool >::type bag(bagSEXP );
         Rcpp::traits::input_parameter< double >::type level(levelSEXP );
-        List __result = newPredictPolywogC(X, poly_terms, coef, avg, interval, level);
+        List __result = computePredict(X, poly_terms, coef, forPredVals, interval, bag, level);
         PROTECT(__sexp_result = Rcpp::wrap(__result));
     }
     UNPROTECT(1);

@@ -1,3 +1,5 @@
+// Utility functions for working with polynomials
+
 #ifndef POLYWOG_POLYNOMIALS_H
 #define POLYWOG_POLYNOMIALS_H
 

@@ -64,14 +64,16 @@ predict.polywog <- function(object, newdata,
 
     ## Setup largely adapted from predict.lm() code; the bits relating to
     ## 'newdata' being a model frame are adapted from mgcv::predict.gam()
+    X.exists <- FALSE
     if (missing(newdata) || is.null(newdata)) {
-        ## Use original model matrix if available
+        ## Use original model matrix or model frame if available
         X <- object$X
         if (is.null(X)) {
             if (is.null(object$model))
                 stop("Fitted object must contain either 'model' or 'X' to use predict.polywog without specifying 'newdata'; re-run polywog with \"model = TRUE\"")
-            X <- makeX(object$formula, object$model, object$degree)
-            X <- X[, object$pivot, drop = FALSE]
+            mf <- object$model
+        } else {
+            X.exists <- TRUE
         }
         nd.is.mf <- FALSE
     } else if (is.data.frame(newdata) && !is.null(attr(newdata, "terms"))) {
@@ -80,8 +82,6 @@ predict.polywog <- function(object, newdata,
         ## original model formula contains transformations of the original
         ## inputs
 
-        X <- makeX(object$formula, newdata, object$degree, na.ok = TRUE)
-        X <- X[, object$pivot, drop = FALSE]
         nd.is.mf <- TRUE
     } else {
         ## Construct model frame from 'newdata'
@@ -94,53 +94,28 @@ predict.polywog <- function(object, newdata,
         if (!is.null(cl <- attr(Terms, "dataClasses")))
             .checkMFClasses(cl, mf)
 
-        ## Construct polynomial-expanded model matrix and remove collinear
-        ## terms
-        X <- makeX(object$formula, mf, object$degree, na.ok = TRUE)
-        X <- X[, object$pivot, drop = FALSE]
         nd.is.mf <- FALSE
     }
-    X <- cbind("(Intercept)" = 1L, X)
 
-    ## Generate predicted values on link scale
-    ##
-    ## Special things are done with "zeroed out" coefficients to ensure that
-    ## predictions can be returned for variables that are NA if they are not
-    ## "included" in the model
-    inMainModel <- coef(object) != 0
-    if (bag || interval) {
-        allPreds <- apply(object$boot.matrix, 1, function(b) {
-            inBootModel <- b != 0
-            X[, inBootModel, drop = FALSE] %*% b[inBootModel]
-        })
-        if (transform)
-            allPreds <- plogis(allPreds)
-    }
-    if (bag) {
-        pred <- rowMeans(allPreds)
-    } else if (transform) {
-        pred <- plogis(drop(X[, inMainModel, drop = FALSE] %*%
-                            coef(object)[inMainModel]))
-    } else {
-        pred <- drop(X[, inMainModel, drop = FALSE] %*%
-                     coef(object)[inMainModel])
+    ## Compute the model matrix
+    if (!X.exists) {
+        X <- makePlainX(object$formula, if (nd.is.mf) newdata else mf)
     }
 
-    ## Confidence intervals
+    ## Call the C++ backend to compute the predicted values and (if requested)
+    ## confidence intervals
+    pred <- computePredict(X = X,
+                           poly_terms = object$polyTerms,
+                           coef = list(main = coef(object),
+                           boot = if (interval || bag) t(object$boot.matrix)),
+                           forPredVals = FALSE,
+                           interval = interval,
+                           bag = bag,
+                           level = level)
     if (interval) {
-        if (level < 0 || level > 1)
-            stop("'level' must be between 0 and 1")
-        q <- 0.5 - (level/2)
-
-        ## The 'tryCatch' statements are necessary to ensure the whole operation
-        ## doesn't fail due to an NA in a single row
-        lwr <- apply(allPreds, 1,
-                     function(x) tryCatch(quantile(x, probs = q),
-                                          error = function(e) NA))
-        upr <- apply(allPreds, 1,
-                     function(x) tryCatch(quantile(x, probs = 1-q),
-                                          error = function(e) NA))
-        pred <- cbind(fit = pred, lwr = lwr, upr = upr)
+        pred <- do.call(cbind, pred)
+    } else {
+        pred <- pred$fit
     }
 
     ## If just computing in-sample fits, ensure conformity with the original
@@ -153,7 +128,7 @@ predict.polywog <- function(object, newdata,
     } else {
         pred <- napredict(attr(mf, "na.action"), pred)
     }
-    
+
     return(pred)
 }
 
@@ -285,7 +260,7 @@ makeProfile <- function(x, ...)
         }
     }
 
-    if ("..." %in% names(cl)) {        
+    if ("..." %in% names(cl)) {
         ## takes the expressions fed to "...", evaluates them within the
         ## supplied data frame, and returns them as a vector.
         ##
@@ -314,32 +289,10 @@ makeProfile <- function(x, ...)
             ans[, i] <- factor(ans[, i], levels = levels(x[, i]))
         }
     }
-    
+
     return(ans)
 }
 
-
-##
-## Predicted values for "typical value" profiles from polywog models
-##
-## ARGUMENTS:
-##   model: a fitted model of class "polywog"
-##   boot.matrix: bootstrap coefficients
-##   xvars: character string naming the covariates to be varied in the profile
-##     (partial matches ok)
-##   xlims: optional named list (partial matches not allowed) specifying the
-##     limits to use for each continuous variable; the observed range will be
-##     used for those not specified
-##   n: number of grid points to use for continuous variables
-##   interval, level, bag: same as in 'predict.polywog'
-##   maxrows: upper limit on number of rows in the profile constructed (this is
-##     to prevent from accidentally trying to calculate 1 million fitted
-##     values after specifying three continuous variables)
-##
-## RETURN:
-##   Data frame with fitted values ('fit'), confidence interval if specified
-##   ('lwr' and 'upr'), and the profile data.
-##
 
 ##' Easy computation of fitted values
 ##'
@@ -354,7 +307,7 @@ makeProfile <- function(x, ...)
 ##' variable of interest, and quickly obtain predicted values.  However, it is
 ##' flexible enough to allow for finely tuned analysis as well.  The function is
 ##' very similar to \code{\link[games]{predProbs}} in the \pkg{games} package.
-##' 
+##'
 ##' The procedure works by varying \code{xvars}, the variables of interest,
 ##' across their observed ranges (or those specified by the user in
 ##' \code{xlims}) while holding all other independent variables in the model
@@ -420,42 +373,69 @@ makeProfile <- function(x, ...)
 ##' ## Predicted prestige by education
 ##' predVals(fit1, "education", n = 10)
 ##' predVals(fit1, "education", n = 10, income = quantile(income, 0.25))
-predVals <- function(model, xvars, xlims = list(), n = 100, interval = TRUE,
-                     level = .95, bag = FALSE, maxrows = 10000, ...)
+##' @import foreach
+##' @importMethodsFrom Matrix t
+predVals <- function(model, xvars,
+                     data = model$model,
+                     xlims = list(), n = 100,
+                     interval = TRUE, level = .95, maxrows = 10000,
+                     report = FALSE, .parallel = FALSE,
+                     ...)
 {
-    ## Check for nothing that depends on bootstrap results if 'boot.matrix' is
-    ## not supplied
-    if (is.null(model$boot.matrix) && (interval || bag))
-    {
-        interval <- bag <- FALSE
-        warning("Options 'interval' and 'bag' not available for models without a 'boot.matrix' element")
+    ## Can't form a confidence interval if no bootstrap results
+    if (is.null(model$boot.matrix) && interval) {
+        interval <- FALSE
+        warning("Option 'interval' not available for models without a 'boot.matrix' element")
     }
 
-    ## Extract original model data
-    dat <- model$model
-    if (is.null(dat))
-        stop("Fitted object must contain 'model' to use predVals; re-run polywog with \"model = TRUE\"")
+    ## Can't print a status bar in parallel
+    if (.parallel)
+        report <- FALSE
 
-    ## Create the varying part of the fitted value profile
-    xc <- getXcols(xvars, names(dat))
-    xv <- getXvals(dat, xc, xlims, n)
+    ## Calculate grid of covariate values to examine
+    xc <- getXcols(xvars, names(data))
+    xv <- getXvals(data, xc, xlims, n)
     if (nrow(xv) > maxrows) {
         stop("Profile generated is too large; re-run with lower n or maxrows >= ",
              nrow(xv), " to continue")
     }
 
-    ## Create the fixed part of the profile and combine with varying part
-    xf <- makeProfile(dat, ...)
-    x <- xf[rep(1, nrow(xv)), , drop = FALSE]
-    rownames(x) <- seq_len(nrow(x))
-    x[, xc] <- xv
+    ## Loop through the grid of covariate values
+    `%dofn%` <- if (.parallel) `%dopar%` else `%do%`
+    if (report)
+        pb <- txtProgressBar(min = 0, max = nrow(xv))
+    ans <- foreach (i = seq_len(nrow(xv)), .combine = rbind) %dofn% {
+        ## Replace the actual values of the selected covariates in the data
+        ## with the i'th row of the grid, while keeping everything else at its
+        ## true values
+        data[, names(xv)] <- xv[i, ]
 
-    ## Calculate fitted values and combine with data frame
-    fit <- predict(model, newdata = x, type = "response", interval = interval,
-                   level = level, bag = bag)
-    ans <- structure(cbind(fit, x[, -1]),
+        ## Create the model matrix
+        X <- makePlainX(model$formula, data)
+
+        pred <- computePredict(X = X,
+                               poly_terms = model$polyTerms,
+                               coef = list(main = coef(model),
+                               boot = if (interval) t(model$boot.matrix)),
+                               forPredVals = TRUE,
+                               interval = interval,
+                               bag = FALSE,
+                               level = level)
+
+        if (report)
+            setTxtProgressBar(pb, i)
+
+        unlist(pred)
+    }
+    ans <- data.frame(cbind(xv, ans))
+    rownames(ans) <- seq_len(nrow(ans))
+
+    if (!interval)
+        ans$lwr <- ans$upr <- NULL
+
+    ans <- structure(ans,
                      interval = interval,
                      xvars = xvars,
-                     xcol = xc - 1 + ifelse(length(dim(fit)), 3, 1))
+                     xcol = seq_len(ncol(xv)))
     return(ans)
 }

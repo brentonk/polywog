@@ -18,9 +18,10 @@ Imports:
     stringr,
     games,
     car,
-    matrixStats
+    matrixStats,
+    foreach,
+    Rcpp (>= 0.11.0)
 LinkingTo: Rcpp
 Suggests:
-    foreach,
     lattice,
     rgl
