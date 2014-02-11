@@ -33,6 +33,29 @@ removeIntercepts <- function(formula., mf)
 }
 
 ##
+## Assemble the 1-dimensional (i.e., non-polynomial-expanded) model matrix
+##
+## ARGUMENTS:
+##   formula: model formula (of class "Formula")
+##   mf: model frame
+##
+## RETURN:
+##   model matrix (no intercept)
+##
+makePlainX <- function(formula, mf)
+{
+    ## Ensure no intercepts included
+    formula <- removeIntercepts(formula, mf)
+
+    ## Extract the model matrix from the model frame
+    X <- model.matrix(formula, data = mf, rhs = 1)
+    if (length(formula)[2] > 1)
+        X <- cbind(X, model.matrix(formula, data = mf, rhs = 2))
+
+    X
+}
+
+##
 ## Assemble polynomial-expanded model matrix (plus linear terms if specified)
 ## without intercept.
 ##
