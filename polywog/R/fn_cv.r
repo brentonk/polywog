@@ -1,8 +1,3 @@
-##' @include helpers.r
-##' @include fitters.r
-##' @include polywog.r
-NULL
-
 ##' Cross-validation for polywog models
 ##'
 ##' Uses k-fold cross-validation to select the polynomial degree and

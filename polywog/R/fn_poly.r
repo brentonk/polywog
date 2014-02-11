@@ -1,13 +1,3 @@
-################################################################################
-### fn_poly.r
-###
-### Functions to create polynomial expansions of matrices
-###
-### Brenton Kenkel and Curt Signorino
-### created 2011-10-25
-### last updated 2012-04-30 (bjk)
-################################################################################
-
 repAsMat <- function(x, n = 1)
 {
     matrix(x, nrow = n, ncol = length(x), byrow = TRUE)

@@ -1,6 +1,3 @@
-##' @include helpers.r
-NULL
-
 ##
 ## Calculate adaptive lasso results.  k-fold cross-validation is used to select
 ## the penalization parameter if 'lambda' is NULL.

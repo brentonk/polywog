@@ -24,13 +24,3 @@ Suggests:
     foreach,
     lattice,
     rgl
-Collate:
-    'RcppExports.R'
-    'helpers.r'
-    'fitters.r'
-    'polywog.r'
-    'fn_cv.r'
-    'fn_pred.r'
-    'fn_marg.r'
-    'fn_plot.r'
-    'fn_poly.r'

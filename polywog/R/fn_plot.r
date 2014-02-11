@@ -1,7 +1,3 @@
-##' @include helpers.r
-##' @include fn_pred.r
-NULL
-
 preplotFromPick <- function(x, pick, ...)
 {
     pp <- predVals(x, xvars = pick, ...)

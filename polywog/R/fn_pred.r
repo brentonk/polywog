@@ -1,6 +1,3 @@
-##' @include helpers.r
-NULL
-
 ##' Predict method for polywog objects
 ##'
 ##' Generates fitted values, including bootstrap confidence intervals, for in-

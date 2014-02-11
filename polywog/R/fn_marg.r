@@ -1,7 +1,3 @@
-##' @include helpers.r
-##' @include fn_pred.r
-NULL
-
 ##' Marginal effects for polywog models
 ##'
 ##' Computes average and observationwise marginal effects from a fitted
