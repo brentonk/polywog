@@ -2,31 +2,6 @@
 
 using namespace Rcpp;
 
-// Compute the representation of x in the specified base, where each element
-// of the returned vector is a digit.
-//
-// The digits are actually returned in reverse order since the order doesn't
-// matter for how this ends up being used in computePolyTerms()
-//
-// The "digits" argument is used to set the length of the return vector.  We
-// could be totally agnostic and just .push_back() without reserving, or
-// slightly less agnostic and compute how many digits are needed via
-// successive powers of the base, but here the number of digits is known in
-// advance depending on the degree of the polyTerms matrix being computed
-std::vector<int> convertBase(int x,
-                             int base,
-                             int digits)
-{
-    std::vector<int> ans(digits, 0);
-
-    for (int i = 0; i < digits; i++) {
-        ans[i] = x % base;
-        x /= base;
-    }
-
-    return ans;
-}
-
 // [[Rcpp::export]]
 List computePolyTerms(int degree,
                       int k_expand,
