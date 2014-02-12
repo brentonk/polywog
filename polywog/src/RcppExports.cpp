@@ -5,6 +5,23 @@
 
 using namespace Rcpp;
 
+// computePolyTerms
+List computePolyTerms(int degree, int k_expand, int k_lin);
+RcppExport SEXP polywog_computePolyTerms(SEXP degreeSEXP, SEXP k_expandSEXP, SEXP k_linSEXP) {
+BEGIN_RCPP
+    SEXP __sexp_result;
+    {
+        Rcpp::RNGScope __rngScope;
+        Rcpp::traits::input_parameter< int >::type degree(degreeSEXP );
+        Rcpp::traits::input_parameter< int >::type k_expand(k_expandSEXP );
+        Rcpp::traits::input_parameter< int >::type k_lin(k_linSEXP );
+        List __result = computePolyTerms(degree, k_expand, k_lin);
+        PROTECT(__sexp_result = Rcpp::wrap(__result));
+    }
+    UNPROTECT(1);
+    return __sexp_result;
+END_RCPP
+}
 // computePredict
 List computePredict(NumericMatrix X, IntegerMatrix poly_terms, List coef, bool forPredVals, bool interval, bool bag, double level);
 RcppExport SEXP polywog_computePredict(SEXP XSEXP, SEXP poly_termsSEXP, SEXP coefSEXP, SEXP forPredValsSEXP, SEXP intervalSEXP, SEXP bagSEXP, SEXP levelSEXP) {
