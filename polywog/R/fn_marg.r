@@ -81,32 +81,13 @@ margEff.polywog <- function(object, xvar = NULL, drop = FALSE, ...)
     if (is.numeric(x) && !xbinary) {
         ##-- CONTINUOUS VARIABLE --##
 
-        ## Extract the raw/un-transformed model matrix
-        formula <- removeIntercepts(object$formula, mf)
-        Xraw <- model.matrix(formula, data = mf, rhs = 1)
-        if (length(object$formula)[2] > 1)
-            Xraw <- cbind(Xraw, model.matrix(formula, data = mf, rhs = 2))
-
-        xc <- getXcols(xvar, colnames(Xraw))
-        ncoef <- length(coef(object)) - 1  # Not considering intercept
-        pt <- object$polyTerms
-        ans <- rep(0, nrow(Xraw))
-
-        ## Loop over each coefficient
-        for (i in seq_len(ncoef)) {
-            ## Move on if the term doesn't include the variable of interest or
-            ## if the term's coefficient is zero
-            if (pt[i, xc] == 0 || coef(object)[i+1] == 0)
-                next
-
-            ## Compute appropriate powers of input variables
-            powers <- pt[i, ]
-            powers[xc] <- powers[xc] - 1
-            Xpow <- sweep(Xraw, 2, powers, "^")
-
-            ## Compute marginal effect with respect to this coefficient
-            ans <- ans + (powers[xc] + 1) * coef(object)[i+1] * .rowProds(Xpow)
-        }
+        X <- makePlainX(object$formula, mf)
+        xc <- getXcols(xvar, colnames(X))
+        ans <- computeMargEff(X = X,
+                              poly_terms = object$polyTerms,
+                              coef = coef(object),
+                              coef_is_zero = coef(object) == 0,
+                              xvar_col = xc - 1)
     } else {
         ##-- DISCRETE VARIABLE --##
 

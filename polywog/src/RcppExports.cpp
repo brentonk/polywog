@@ -5,6 +5,25 @@
 
 using namespace Rcpp;
 
+// computeMargEff
+NumericVector computeMargEff(NumericMatrix X, IntegerMatrix poly_terms, NumericVector coef, LogicalVector coef_is_zero, int xvar_col);
+RcppExport SEXP polywog_computeMargEff(SEXP XSEXP, SEXP poly_termsSEXP, SEXP coefSEXP, SEXP coef_is_zeroSEXP, SEXP xvar_colSEXP) {
+BEGIN_RCPP
+    SEXP __sexp_result;
+    {
+        Rcpp::RNGScope __rngScope;
+        Rcpp::traits::input_parameter< NumericMatrix >::type X(XSEXP );
+        Rcpp::traits::input_parameter< IntegerMatrix >::type poly_terms(poly_termsSEXP );
+        Rcpp::traits::input_parameter< NumericVector >::type coef(coefSEXP );
+        Rcpp::traits::input_parameter< LogicalVector >::type coef_is_zero(coef_is_zeroSEXP );
+        Rcpp::traits::input_parameter< int >::type xvar_col(xvar_colSEXP );
+        NumericVector __result = computeMargEff(X, poly_terms, coef, coef_is_zero, xvar_col);
+        PROTECT(__sexp_result = Rcpp::wrap(__result));
+    }
+    UNPROTECT(1);
+    return __sexp_result;
+END_RCPP
+}
 // computePolyTerms
 List computePolyTerms(int degree, int k_expand, int k_lin);
 RcppExport SEXP polywog_computePolyTerms(SEXP degreeSEXP, SEXP k_expandSEXP, SEXP k_linSEXP) {
