@@ -3,7 +3,7 @@ polywog
 
 `polywog` is an R package by [Brenton Kenkel](http://www.bkenkel.com/) and
 [Curtis Signorino](http://www.rochester.edu/college/psc/signorino/) containing
-routines for flexible functional form via basis regression with
+routines for flexible functional form estimation via basis regression with
 oracle-penalized model selection.  You can install the most recent stable
 version of the package
 [from CRAN](http://cran.r-project.org/web/packages/polywog/index.html) by
