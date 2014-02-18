@@ -2,5 +2,9 @@
 *.tar.gz
 
 # Rcpp object files
-polywog/src/*.o
-polywog/src/*.so
+src/*.o
+src/*.so
+
+# R data and history
+.RData
+.Rhistory
