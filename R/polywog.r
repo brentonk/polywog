@@ -185,6 +185,7 @@ NULL
 ##' ## Change regularization method
 ##' fit2 <- update(fit1, method = "scad")
 ##' cbind(coef(fit1), coef(fit2))
+##' @import Formula
 polywog <- function(formula, data, subset, weights, na.action,
                     degree = 3,
                     family = c("gaussian", "binomial"),
@@ -489,12 +490,6 @@ bootPolywog <- function(model, nboot = 100, reuse.lambda = FALSE,
                         scad.maxit = 5000,
                         .parallel = FALSE, .matrixOnly = FALSE)
 {
-    ## Load 'foreach' package for parallelization if requested
-    if (.parallel && !require("foreach")) {
-        .parallel <- FALSE
-        warning("Must have 'foreach' package installed to use parallelization")
-    }
-
     ## Can't have a progress bar in parallel, sadly
     if (.parallel && report) {
         report <- FALSE

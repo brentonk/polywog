@@ -18,6 +18,7 @@
 ##   coef: coefficients from the fitted adaptive lasso model
 ##   lambda: penalization parameter used to obtain coefficients
 ##
+##' @import glmnet
 fitALasso <- function(X, y, weights, family, penwt, lambda, nfolds, ...)
 {
     if (is.null(lambda)) {
@@ -40,6 +41,7 @@ fitALasso <- function(X, y, weights, family, penwt, lambda, nfolds, ...)
 ##
 ## Analogue of fitALasso, for SCAD
 ##
+##' @import ncvreg
 fitSCAD <- function(X, y, family, lambda, nfolds, scad.maxit, ...)
 {
     if (is.null(lambda)) {

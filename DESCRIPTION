@@ -9,6 +9,7 @@ Description: Routines for flexible functional form estimation via basis
     overfitting.
 License: GPL (>= 2)
 Depends:
+    foreach,
     glmnet (>= 1.5.1),
     ncvreg,
     Formula,
@@ -16,12 +17,9 @@ Depends:
     miscTools
 Imports:
     stringr,
-    games,
-    car,
-    matrixStats,
-    foreach,
     Rcpp (>= 0.11.0)
 LinkingTo: Rcpp
 Suggests:
+    car,
     lattice,
     rgl
