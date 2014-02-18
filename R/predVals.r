@@ -163,6 +163,10 @@ getXvals <- function(data, cols, xlims, n)
 ##' @param ... other arguments, currently ignored
 ##' @return A data frame containing the fitted values and confidence intervals
 ##' (if requested) for each combination of covariate values.
+##'
+##' The returned data frame also inherits from class \code{"preplot.polywog"}.
+##' This is used by \code{\link{plot.polywog}}, which calls \code{predVals} to
+##' compute the values to plot.
 ##' @seealso \code{\link{predict.polywog}} for more flexible (but less
 ##' user-friendly) computation of fitted values.  \code{\link{plot.polywog}} for
 ##' plotting fitted values and their confidence intervals.
@@ -250,6 +254,7 @@ predVals <- function(model, xvars,
     ans <- structure(ans,
                      interval = interval,
                      xvars = xvars,
-                     xcol = seq_len(ncol(xv)))
+                     xcol = seq_len(ncol(xv)),
+                     class = c("preplot.polywog", "data.frame"))
     return(ans)
 }

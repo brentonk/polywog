@@ -1,10 +1,3 @@
-preplotFromPick <- function(x, pick, ...)
-{
-    pp <- predVals(x, xvars = pick, ...)
-    ans <- structure(pp, class = c("preplot.polywog", "data.frame"))
-    return(ans)
-}
-
 ##' Univariate and bivariate fitted value plots
 ##'
 ##' Generates plots of the relationship between input variables and the expected
@@ -37,9 +30,6 @@ preplotFromPick <- function(x, pick, ...)
 ##' around each fitted value.  Not available for bivariate plots unless
 ##' \code{FUN3d = "persp3d"}.
 ##' @param level confidence level for the intervals.
-##' @param bag logical: whether to use "bootstrap aggregation" to generate the
-##' main fitted values (if \code{FALSE}, they are calculated from the main model
-##' fit).
 ##' @param FUN3D which plotting function to use to generate bivariate plots.
 ##' Valid options include \code{"\link{contour}"} (the default) and
 ##' \code{"\link{filled.contour}"}; \code{"\link[lattice]{wireframe}"}, which
@@ -90,7 +80,7 @@ preplotFromPick <- function(x, pick, ...)
 ##'   # 3: type
 ##' }
 plot.polywog <- function(x, which = NULL, ask = FALSE, auto.set.par = TRUE,
-                         interval = TRUE, level = 0.95, bag = TRUE,
+                         interval = TRUE, level = 0.95,
                          FUN3D = c("contour", "filled.contour", "wireframe",
                          "persp3d"),
                          control.plot = list(),
@@ -122,8 +112,8 @@ plot.polywog <- function(x, which = NULL, ask = FALSE, auto.set.par = TRUE,
             if (any(pick < 1))
                 break
             pick <- xnames[pick]
-            pp <- preplotFromPick(x, pick = pick, interval = interval, level =
-                                  level, bag = bag, ...)
+            pp <- predVals(x, xvars = pick, interval = interval, level =
+                           level, ...)
             plot(pp, auto.set.par = auto.set.par, FUN3D = FUN3D, control.plot =
                  control.plot)
         }
@@ -131,8 +121,8 @@ plot.polywog <- function(x, which = NULL, ask = FALSE, auto.set.par = TRUE,
         if (length(which) > 2)
             stop("Cannot select more than two variables")
         pick <- if (is.numeric(which)) xnames[which] else which
-        pp <- preplotFromPick(x, pick = pick, interval = interval, level =
-                              level, bag = bag, ...)
+        pp <- predVals(x, xvars = pick, interval = interval, level = level,
+                       ...)
         plot(pp, auto.set.par = auto.set.par, FUN3D = FUN3D, control.plot =
              control.plot)
     } else {
@@ -145,8 +135,8 @@ plot.polywog <- function(x, which = NULL, ask = FALSE, auto.set.par = TRUE,
         }
         pp <- list()
         for (i in seq_along(xnames)) {
-            ppi <- preplotFromPick(x, pick = xnames[i], interval = interval,
-                                   level = level, bag = bag, ...)
+            ppi <- predVals(x, xvars = xnames[i], interval = interval,
+                            level = level, ...)
             plot(ppi, auto.set.par = auto.set.par, FUN3D = FUN3D, control.plot =
                  control.plot)
             pp[[i]] <- ppi

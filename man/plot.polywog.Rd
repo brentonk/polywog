@@ -3,8 +3,8 @@
 \title{Univariate and bivariate fitted value plots}
 \usage{
 \method{plot}{polywog}(x, which = NULL, ask = FALSE, auto.set.par = TRUE,
-  interval = TRUE, level = 0.95, bag = TRUE, FUN3D = c("contour",
-  "filled.contour", "wireframe", "persp3d"), control.plot = list(), ...)
+  interval = TRUE, level = 0.95, FUN3D = c("contour", "filled.contour",
+  "wireframe", "persp3d"), control.plot = list(), ...)
 }
 \arguments{
   \item{x}{a fitted model of class \code{"polywog"},
@@ -31,11 +31,6 @@
   "persp3d"}.}
 
   \item{level}{confidence level for the intervals.}
-
-  \item{bag}{logical: whether to use "bootstrap
-  aggregation" to generate the main fitted values (if
-  \code{FALSE}, they are calculated from the main model
-  fit).}
 
   \item{FUN3D}{which plotting function to use to generate
   bivariate plots. Valid options include

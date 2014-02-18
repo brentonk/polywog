@@ -48,6 +48,11 @@ predVals(model, xvars, data = model$model, xlims = list(), n = 100,
 A data frame containing the fitted values and confidence
 intervals (if requested) for each combination of covariate
 values.
+
+The returned data frame also inherits from class
+\code{"preplot.polywog"}. This is used by
+\code{\link{plot.polywog}}, which calls \code{predVals} to
+compute the values to plot.
 }
 \description{
 User-friendly generation of fitted values and their
