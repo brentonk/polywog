@@ -145,4 +145,3 @@ cv.polywog <- function(formula,
     class(ans) <- "cv.polywog"
     ans
 }
-
