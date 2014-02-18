@@ -222,29 +222,3 @@ plot.margEff.polywog <- function(x, ...)
 
     invisible(x)
 }
-
-## Bug-fixed version of matrixStats::rowProds (which was released under an
-## Artistic-2.0 license, which is compatible with the GPL and hence can be
-## redistributed with modification here)
-
-.rowProds <- function (x, ...) 
-{
-    s <- (x == 0)
-    s <- rowSums(s)
-    ok <- (s == 0)
-    rm(s)
-    y <- vector(mode(x), nrow(x))
-    x <- x[ok, , drop = FALSE]
-    s <- (x < 0)
-    s <- rowSums(s)
-    s <- (s%%2)
-    s <- c(+1, -1)[s + 1]
-    x <- abs(x)
-    x <- log(x)
-    x <- rowSums(x, ...)
-    x <- exp(x)
-    x <- s * x
-    y[ok] <- x
-    rm(ok, s, x)
-    y
-}
