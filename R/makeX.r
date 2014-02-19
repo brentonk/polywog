@@ -6,7 +6,8 @@
 ##   mf: model frame
 ##
 ## RETURN:
-##   model matrix (no intercept)
+##   model matrix (no intercept), with attribute "k_expand" telling how many
+##   columns should be included in the polynomial expansion
 ##
 makePlainX <- function(formula, mf)
 {
@@ -15,10 +16,11 @@ makePlainX <- function(formula, mf)
 
     ## Extract the model matrix from the model frame
     X <- model.matrix(formula, data = mf, rhs = 1)
+    k_expand <- ncol(X)
     if (length(formula)[2] > 1)
         X <- cbind(X, model.matrix(formula, data = mf, rhs = 2))
 
-    X
+    structure(X, k_expand = k_expand)
 }
 
 ##
