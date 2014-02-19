@@ -4,6 +4,7 @@
 #include <Rcpp.h>
 
 Rcpp::NumericVector rawToPoly(Rcpp::NumericVector x,
-                              Rcpp::IntegerMatrix poly_terms);
+                              Rcpp::IntegerMatrix poly_terms,
+                              bool intercept = true);
 
 #endif  // POLYWOG_POLYNOMIALS_H
