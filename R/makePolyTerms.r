@@ -7,13 +7,15 @@
 ##   k_lin: number of terms to include linearly
 ##   binary_cols: logical vector indicating which columns of the raw input
 ##     matrix contain binary variables
+##   names.: optional character vector containing the name of each raw input
+##     variable
 ##
 ## RETURN:
 ##   Matrix where each column is a raw model term, each row is a term of the
 ##   polynomial expansion, and each entry ij is the degree of raw term i in
 ##   expansion term j
 ##
-makePolyTerms <- function(degree, k_expand, k_lin, binary_cols)
+makePolyTerms <- function(degree, k_expand, k_lin, binary_cols, names. = NULL)
 {
     ## Call C++ routine to compute the full set of potential polynomial terms
     ans <- computePolyTerms(degree, k_expand, k_lin)
@@ -26,12 +28,15 @@ makePolyTerms <- function(degree, k_expand, k_lin, binary_cols)
 
     ## Combine into a single matrix
     ans <- do.call(rbind, ans)
+    if (!is.null(names.)) {
+        colnames(ans) <- names.
+    }
 
     ## Remove any expanded term that contains a square power (or greater) of a
     ## binary variable, since it will be collinear with a lower-order term
     if (any(binary_cols)) {
         any_higher_binary <- rowSums(ans[, binary_cols, drop = FALSE] > 1)
-        ans <- ans[!any_higher_binary, ]
+        ans <- ans[!any_higher_binary, , drop = FALSE]
     }
 
     ## Add row and column names (if requested)
