@@ -34,5 +34,23 @@ makePolyTerms <- function(degree, k_expand, k_lin, binary_cols)
         ans <- ans[!any_higher_binary, ]
     }
 
+    ## Add row and column names (if requested)
+    if (!is.null(names.)) {
+        ## Column names
+        colnames(ans) <- names.
+
+        ## Row names
+        termNames <- apply(ans, 1, function(x) {
+            deg <- as.character(x)
+            deg <- ifelse(x == 1,
+                          "",
+                          paste("^", deg, sep = ""))
+            deg <- paste(names., deg, sep = "")
+            deg <- paste(deg[x > 0], collapse = ".")
+            deg
+        })
+        rownames(ans) <- termNames
+    }
+
     ans
 }
