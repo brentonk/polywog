@@ -28,9 +28,6 @@ makePolyTerms <- function(degree, k_expand, k_lin, binary_cols, names. = NULL)
 
     ## Combine into a single matrix
     ans <- do.call(rbind, ans)
-    if (!is.null(names.)) {
-        colnames(ans) <- names.
-    }
 
     ## Remove any expanded term that contains a square power (or greater) of a
     ## binary variable, since it will be collinear with a lower-order term
