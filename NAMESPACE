@@ -1,4 +1,6 @@
 S3method(margEff,polywog)
+S3method(model.frame,polywog)
+S3method(model.matrix,polywog)
 S3method(plot,margEff.polywog)
 S3method(plot,polywog)
 S3method(plot,preplot.polywog)
