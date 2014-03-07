@@ -229,7 +229,7 @@ predVals <- function(model, xvars,
         data[, names(xv)] <- xv[i, ]
 
         ## Create the model matrix
-        X <- makePlainX(model$formula, data)
+        X <- makeX(model$formula, data)
 
         pred <- computePredict(X = X,
                                poly_terms = model$polyTerms,

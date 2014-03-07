@@ -81,7 +81,7 @@ margEff.polywog <- function(object, xvar = NULL, drop = FALSE, ...)
     if (is.numeric(x) && !xbinary) {
         ##-- CONTINUOUS VARIABLE --##
 
-        X <- makePlainX(object$formula, mf)
+        X <- makeX(object$formula, mf)
         xc <- getXcols(xvar, colnames(X))
         ans <- computeMargEff(X = X,
                               poly_terms = object$polyTerms,

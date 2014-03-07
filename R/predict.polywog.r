@@ -82,7 +82,7 @@ predict.polywog <- function(object, newdata,
 
     ## Compute the model matrix
     if (!X.exists) {
-        X <- makePlainX(object$formula, if (nd.is.mf) newdata else mf)
+        X <- makeX(object$formula, if (nd.is.mf) newdata else mf)
     }
 
     ## Call the C++ backend to compute the predicted values and (if requested)
