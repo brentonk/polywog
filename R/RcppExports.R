@@ -13,3 +13,7 @@ computePredict <- function(X, poly_terms, coef, forPredVals, interval, bag, leve
     .Call('polywog_computePredict', PACKAGE = 'polywog', X, poly_terms, coef, forPredVals, interval, bag, level)
 }
 
+expandMatrix <- function(X, poly_terms) {
+    .Call('polywog_expandMatrix', PACKAGE = 'polywog', X, poly_terms)
+}
+

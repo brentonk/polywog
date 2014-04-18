@@ -62,3 +62,19 @@ BEGIN_RCPP
     return __sexp_result;
 END_RCPP
 }
+// expandMatrix
+NumericMatrix expandMatrix(NumericMatrix X, IntegerMatrix poly_terms);
+RcppExport SEXP polywog_expandMatrix(SEXP XSEXP, SEXP poly_termsSEXP) {
+BEGIN_RCPP
+    SEXP __sexp_result;
+    {
+        Rcpp::RNGScope __rngScope;
+        Rcpp::traits::input_parameter< NumericMatrix >::type X(XSEXP );
+        Rcpp::traits::input_parameter< IntegerMatrix >::type poly_terms(poly_termsSEXP );
+        NumericMatrix __result = expandMatrix(X, poly_terms);
+        PROTECT(__sexp_result = Rcpp::wrap(__result));
+    }
+    UNPROTECT(1);
+    return __sexp_result;
+END_RCPP
+}
