@@ -5,6 +5,22 @@
 
 using namespace Rcpp;
 
+// computeExpandMatrix
+NumericMatrix computeExpandMatrix(NumericMatrix X, IntegerMatrix poly_terms);
+RcppExport SEXP polywog_computeExpandMatrix(SEXP XSEXP, SEXP poly_termsSEXP) {
+BEGIN_RCPP
+    SEXP __sexp_result;
+    {
+        Rcpp::RNGScope __rngScope;
+        Rcpp::traits::input_parameter< NumericMatrix >::type X(XSEXP );
+        Rcpp::traits::input_parameter< IntegerMatrix >::type poly_terms(poly_termsSEXP );
+        NumericMatrix __result = computeExpandMatrix(X, poly_terms);
+        PROTECT(__sexp_result = Rcpp::wrap(__result));
+    }
+    UNPROTECT(1);
+    return __sexp_result;
+END_RCPP
+}
 // computeMargEff
 NumericVector computeMargEff(NumericMatrix X, IntegerMatrix poly_terms, NumericVector coef, LogicalVector coef_is_zero, int xvar_col);
 RcppExport SEXP polywog_computeMargEff(SEXP XSEXP, SEXP poly_termsSEXP, SEXP coefSEXP, SEXP coef_is_zeroSEXP, SEXP xvar_colSEXP) {
@@ -56,22 +72,6 @@ BEGIN_RCPP
         Rcpp::traits::input_parameter< bool >::type bag(bagSEXP );
         Rcpp::traits::input_parameter< double >::type level(levelSEXP );
         List __result = computePredict(X, poly_terms, coef, forPredVals, interval, bag, level);
-        PROTECT(__sexp_result = Rcpp::wrap(__result));
-    }
-    UNPROTECT(1);
-    return __sexp_result;
-END_RCPP
-}
-// expandMatrix
-NumericMatrix expandMatrix(NumericMatrix X, IntegerMatrix poly_terms);
-RcppExport SEXP polywog_expandMatrix(SEXP XSEXP, SEXP poly_termsSEXP) {
-BEGIN_RCPP
-    SEXP __sexp_result;
-    {
-        Rcpp::RNGScope __rngScope;
-        Rcpp::traits::input_parameter< NumericMatrix >::type X(XSEXP );
-        Rcpp::traits::input_parameter< IntegerMatrix >::type poly_terms(poly_termsSEXP );
-        NumericMatrix __result = expandMatrix(X, poly_terms);
         PROTECT(__sexp_result = Rcpp::wrap(__result));
     }
     UNPROTECT(1);

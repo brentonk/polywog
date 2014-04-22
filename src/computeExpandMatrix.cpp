@@ -3,8 +3,8 @@
 using namespace Rcpp;
 
 // [[Rcpp::export]]
-NumericMatrix expandMatrix(NumericMatrix X,
-                           IntegerMatrix poly_terms)
+NumericMatrix computeExpandMatrix(NumericMatrix X,
+                                  IntegerMatrix poly_terms)
 {
     int n_obs = X.nrow();
     int n_raw_terms = poly_terms.ncol();

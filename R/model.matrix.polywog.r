@@ -37,13 +37,8 @@ model.matrix.polywog <- function(object, type = c("raw", "expanded"), ...)
     }
 
     ## Compute the polynomial expansion if requested
-    if (type == "expanded") {
-        origRowNames <- rownames(X)
-        X <- expandMatrix(X, object$polyTerms)
-        rownames(X) <- origRowNames
-        colnames(X) <- rownames(object$polyTerms)
-        X <- cbind("(Intercept)" = 1L, X)
-    }
+    if (type == "expanded")
+        X <- expandMatrix(X, object$polyTerms, intercept = TRUE)
 
     X
 }
