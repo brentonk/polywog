@@ -9,7 +9,9 @@ version of the package
 [from CRAN](http://cran.r-project.org/web/packages/polywog/index.html) by
 running
 
-    install.packages("polywog")
+```r
+install.packages("polywog")
+```
 
 in an R console.
 
