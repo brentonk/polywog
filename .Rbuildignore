@@ -1,2 +1,5 @@
 # Tarballs of previous package versions
 archive/*
+
+# Local test files
+test.local/*
