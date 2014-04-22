@@ -146,7 +146,8 @@ predVals <- function(model, xvars,
                                forPredVals = TRUE,
                                interval = interval,
                                bag = FALSE,
-                               level = level)
+                               level = level,
+                               transform = model$family == "binomial")
 
         if (report)
             setTxtProgressBar(pb, i)

@@ -1,4 +1,5 @@
 #include <Rcpp.h>
+#include "logit.h"
 #include "polynomials.h"
 #include "sparse.h"
 
@@ -22,7 +23,8 @@ List computePredict(NumericMatrix X,
                     bool forPredVals,
                     bool interval,
                     bool bag,
-                    double level)
+                    double level,
+                    bool transform = false)
 {
     // Storage for final output
     //
@@ -58,10 +60,15 @@ List computePredict(NumericMatrix X,
         // Calculate predicted values from the main model fit
         NumericVector x_row = X.row(i);
         NumericVector x_row_poly = rawToPoly(x_row, poly_terms);
+        double xb_row = sum(x_row_poly * coef_main);
+        if (transform)
+            xb_row = transformLogit(xb_row);
+
+        // Store result from main fit (unless bagging)
         if (forPredVals) {
-            predicted[0] += sum(x_row_poly * coef_main) / n_obs;
+            predicted[0] += xb_row / n_obs;
         } else if (!bag) {
-            predicted[i] = sum(x_row_poly * coef_main);
+            predicted[i] = xb_row;
         }
 
         // Loop through the bootstrap coefficients (don't need to wrap this
@@ -70,6 +77,8 @@ List computePredict(NumericMatrix X,
         for (int j = 0; j < n_boot; j++) {
             NumericVector coef_boot = columnFromSparse(boot_matrix, j);
             double xb_boot = sum(x_row_poly * coef_boot);
+            if (transform)
+                xb_boot = transformLogit(xb_boot);
 
             if (forPredVals) {
                 // Under predVals, to calculate a confidence interval, we are

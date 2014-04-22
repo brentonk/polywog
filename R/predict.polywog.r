@@ -94,7 +94,8 @@ predict.polywog <- function(object, newdata,
                            forPredVals = FALSE,
                            interval = interval,
                            bag = bag,
-                           level = level)
+                           level = level,
+                           transform = transform)
     if (interval) {
         pred <- do.call(cbind, pred)
     } else {

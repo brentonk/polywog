@@ -13,7 +13,7 @@ computePolyTerms <- function(degree, k_expand, k_lin) {
     .Call('polywog_computePolyTerms', PACKAGE = 'polywog', degree, k_expand, k_lin)
 }
 
-computePredict <- function(X, poly_terms, coef, forPredVals, interval, bag, level) {
-    .Call('polywog_computePredict', PACKAGE = 'polywog', X, poly_terms, coef, forPredVals, interval, bag, level)
+computePredict <- function(X, poly_terms, coef, forPredVals, interval, bag, level, transform = FALSE) {
+    .Call('polywog_computePredict', PACKAGE = 'polywog', X, poly_terms, coef, forPredVals, interval, bag, level, transform)
 }
 

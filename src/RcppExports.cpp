@@ -58,8 +58,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // computePredict
-List computePredict(NumericMatrix X, IntegerMatrix poly_terms, List coef, bool forPredVals, bool interval, bool bag, double level);
-RcppExport SEXP polywog_computePredict(SEXP XSEXP, SEXP poly_termsSEXP, SEXP coefSEXP, SEXP forPredValsSEXP, SEXP intervalSEXP, SEXP bagSEXP, SEXP levelSEXP) {
+List computePredict(NumericMatrix X, IntegerMatrix poly_terms, List coef, bool forPredVals, bool interval, bool bag, double level, bool transform = false);
+RcppExport SEXP polywog_computePredict(SEXP XSEXP, SEXP poly_termsSEXP, SEXP coefSEXP, SEXP forPredValsSEXP, SEXP intervalSEXP, SEXP bagSEXP, SEXP levelSEXP, SEXP transformSEXP) {
 BEGIN_RCPP
     SEXP __sexp_result;
     {
@@ -71,7 +71,8 @@ BEGIN_RCPP
         Rcpp::traits::input_parameter< bool >::type interval(intervalSEXP );
         Rcpp::traits::input_parameter< bool >::type bag(bagSEXP );
         Rcpp::traits::input_parameter< double >::type level(levelSEXP );
-        List __result = computePredict(X, poly_terms, coef, forPredVals, interval, bag, level);
+        Rcpp::traits::input_parameter< bool >::type transform(transformSEXP );
+        List __result = computePredict(X, poly_terms, coef, forPredVals, interval, bag, level, transform);
         PROTECT(__sexp_result = Rcpp::wrap(__result));
     }
     UNPROTECT(1);
