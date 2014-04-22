@@ -69,6 +69,12 @@ margEff.polywog <- function(object, xvar = NULL, drop = FALSE, ...)
                               coef = coef(object),
                               coef_is_zero = coef(object) == 0,
                               xvar_col = xc - 1)
+
+        ## Derivative of logit transformation
+        if (object$family == "binomial") {
+            xb <- predict(object, type = "link")
+            ans <- dlogis(xb) * ans
+        }
     } else {
         ##-- DISCRETE VARIABLE --##
 
