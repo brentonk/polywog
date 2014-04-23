@@ -6,9 +6,10 @@
 A package for flexible functional form estimation via
 bootstrapped basis regression with oracle model selection.
 This version of the software should be considered
-\strong{in beta}.  Please email the maintainer, Brenton
-Kenkel (\email{brenton.kenkel@gmail.com}), with bug reports
-or feature requests.
+\strong{in beta}.  For bug reports and feature requests,
+please email Brenton Kenkel
+(\email{brenton.kenkel@gmail.com}) or file an issue at
+\url{https://github.com/brentonk/polywog-package/issues}.
 }
 \section{Acknowledgements}{
   We are grateful to Tyson Chatangier for many helpful

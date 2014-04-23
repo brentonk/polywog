@@ -8,6 +8,7 @@ Description: Routines for flexible functional form estimation via basis
     regression, with model selection via the adaptive LASSO or SCAD to prevent
     overfitting.
 License: GPL (>= 2)
+URL: https://github.com/brentonk/polywog-package
 Depends:
     foreach,
     glmnet (>= 1.9.5),
