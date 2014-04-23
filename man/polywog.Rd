@@ -137,14 +137,16 @@ specified method for calculating the adaptive LASSO weights
 (\code{NULL} for models fit via SCAD).}
 \item{\code{unpenalized}}{logical vector indicating which
 terms were not included in the LASSO penalty.}
-\item{\code{terms}}{the \code{\link{terms}} object used to
-construct the model frame.} \item{\code{polyTerms}}{a
-matrix indicating the power of each raw input term
-(columns) in each term of the polynomial expansion used in
-fitting (rows).} \item{\code{nobs}}{the number of
-observations used to fit the model.}
-\item{\code{na.action}}{information on how \code{NA} values
-in the input data were handled.}
+\item{\code{thresh}}{convergence threshold used in
+fitting.} \item{\code{maxit}}{iteration limit used in
+fitting.} \item{\code{terms}}{the \code{\link{terms}}
+object used to construct the model frame.}
+\item{\code{polyTerms}}{a matrix indicating the power of
+each raw input term (columns) in each term of the
+polynomial expansion used in fitting (rows).}
+\item{\code{nobs}}{the number of observations used to fit
+the model.} \item{\code{na.action}}{information on how
+\code{NA} values in the input data were handled.}
 \item{\code{xlevels}}{levels of factor variables used in
 fitting.} \item{\code{varNames}}{names of the raw input
 variables included in the model formula.}

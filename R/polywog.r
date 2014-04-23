@@ -149,6 +149,8 @@ NULL
 ##' the adaptive LASSO weights (\code{NULL} for models fit via SCAD).}
 ##'   \item{\code{unpenalized}}{logical vector indicating which terms were not
 ##' included in the LASSO penalty.}
+##'   \item{\code{thresh}}{convergence threshold used in fitting.}
+##'   \item{\code{maxit}}{iteration limit used in fitting.}
 ##'   \item{\code{terms}}{the \code{\link{terms}} object used to construct the
 ##' model frame.}
 ##'   \item{\code{polyTerms}}{a matrix indicating the power of each raw input
@@ -346,6 +348,8 @@ polywog <- function(formula,
                 method = method,
                 penwt.method = if (method == "alasso") penwt.method,
                 unpenalized = if (method == "alasso") unpenalized,
+                thresh = thresh,
+                maxit = maxit,
                 ## (5)
                 terms = terms,
                 polyTerms = polyTerms,

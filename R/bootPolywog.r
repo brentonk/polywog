@@ -28,11 +28,9 @@
 ##' to the largest, as in \code{\link{polywog}}.
 ##' @param nfolds number of cross-validation folds to use.
 ##' @param thresh convergence threshold, as in \code{\link{polywog}}.  If
-##' \code{NULL}, use the default value for the fitting method (1e-7 for the
-##' adaptive LASSO, 1e-3 for SCAD).
+##' \code{NULL}, use the same value as in the original model.
 ##' @param maxit iteration limit for fitting, as in \code{\link{polywog}}.  If
-##' \code{NULL}, use the default value for the fitting method (100,000 for the
-##' adaptive LASSO, 5,000 for SCAD).
+##' \code{NULL}, use the same value as in the original model.
 ##' @param maxtries maximum number of attempts to generate a bootstrap sample
 ##' with a non-collinear model matrix (often problematic with lopsided binary
 ##' regressors) before stopping and issuing an error message.
@@ -97,9 +95,9 @@ bootPolywog <- function(model,
     ## If not specified, set convergence tolerance and maximum iterations to
     ## their defaults, depending on the type of model
     if (is.null(thresh))
-        thresh <- ifelse(model$method == "alasso", 1e-7, 0.001)
+        thresh <- model$thresh
     if (is.null(maxit))
-        maxit <- ifelse(model$method == "alasso", 1e5, 5000)
+        maxit <- model$maxit
 
     ## Set up progress bar
     pb <- txtProgressBar(min = 0, max = nboot)

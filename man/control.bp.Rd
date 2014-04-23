@@ -32,14 +32,12 @@ control.bp(.parallel = FALSE, reuse.lambda = FALSE, reuse.penwt = FALSE,
   \item{nfolds}{number of cross-validation folds to use.}
 
   \item{thresh}{convergence threshold, as in
-  \code{\link{polywog}}.  If \code{NULL}, use the default
-  value for the fitting method (1e-7 for the adaptive
-  LASSO, 1e-3 for SCAD).}
+  \code{\link{polywog}}.  If \code{NULL}, use the same
+  value as in the original model.}
 
   \item{maxit}{iteration limit for fitting, as in
-  \code{\link{polywog}}.  If \code{NULL}, use the default
-  value for the fitting method (100,000 for the adaptive
-  LASSO, 5,000 for SCAD).}
+  \code{\link{polywog}}.  If \code{NULL}, use the same
+  value as in the original model.}
 
   \item{maxtries}{maximum number of attempts to generate a
   bootstrap sample with a non-collinear model matrix (often
