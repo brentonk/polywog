@@ -23,7 +23,7 @@ model.frame.polywog <- function(formula, ...)
     } else {
         ## Closely adapted from the code of 'model.frame.lm'
         fcall <- formula$call
-        m <- match(c("data", "subset", "na.action"), names(fcall), 0L)
+        m <- match(c("data", "subset", "weights", "na.action"), names(fcall), 0L)
         fcall <- fcall[c(1L, m)]
         fcall$drop.unused.levels <- TRUE
         fcall[[1L]] <- quote(stats::model.frame)
