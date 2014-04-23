@@ -1,11 +1,16 @@
 \name{bootPolywog}
 \alias{bootPolywog}
+\alias{control.bp}
 \title{Bootstrap a fitted polywog model}
 \usage{
 bootPolywog(model, nboot = 100, .parallel = FALSE, reuse.lambda = FALSE,
   reuse.penwt = FALSE, nlambda = 100, lambda.min.ratio = 1e-04,
   nfolds = 10, thresh = NULL, maxit = NULL, maxtries = 1000,
   min.prop = 0, report = FALSE, .matrixOnly = FALSE)
+
+control.bp(.parallel = FALSE, reuse.lambda = FALSE, reuse.penwt = FALSE,
+  nlambda = 100, lambda.min.ratio = 1e-04, nfolds = 10, thresh = NULL,
+  maxit = NULL, maxtries = 1000, min.prop = 0, report = FALSE)
 }
 \arguments{
   \item{model}{a fitted model of class \code{"polywog"},
@@ -79,7 +84,9 @@ matrix is a sparse matrix of class
 Nonparametric bootstrap of the \code{\link{polywog}}
 regression procedure. Can be run on a fitted model of class
 \code{"polywog"}, or within the original procedure via the
-\code{boot} argument.
+\code{boot} argument.  The function \code{control.bp} can
+be used to pass options to \code{bootPolywog} when
+bootstrapping within \code{\link{polywog}}.
 }
 \details{
 Parallel computation via the \code{.parallel} argument

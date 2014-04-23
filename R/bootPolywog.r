@@ -2,7 +2,9 @@
 ##'
 ##' Nonparametric bootstrap of the \code{\link{polywog}} regression procedure.
 ##' Can be run on a fitted model of class \code{"polywog"}, or within the
-##' original procedure via the \code{boot} argument.
+##' original procedure via the \code{boot} argument.  The function
+##' \code{control.bp} can be used to pass options to \code{bootPolywog} when
+##' bootstrapping within \code{\link{polywog}}.
 ##'
 ##' Parallel computation via the \code{.parallel} argument requires
 ##' registation of a backend for \code{\link[foreach:foreach]{\%dopar\%}}, as
@@ -198,13 +200,7 @@ bootPolywog <- function(model,
     }
 }
 
-##' Auxiliary for bootstrap options
-##'
-##' Used to pass options to \code{\link{bootPolywog}} when bootstrapping via the
-##' \code{boot} option of the main \code{\link{polywog}} function.
-##' @inheritParams bootPolywog
-##' @return A list containing the function arguments.
-##' @author Brenton Kenkel and Curtis S. Signorino
+##' @rdname bootPolywog
 ##' @export
 control.bp <- function(.parallel = FALSE,
                        reuse.lambda = FALSE,
