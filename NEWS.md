@@ -31,9 +31,14 @@
     * `thresh` and `maxit` for finer control of the convergence criterion,
       replacing old argument `scad.maxit`
 
-* Package now requires version 1.9.5 or greater of `glmnet` (for parallel
-  computation) and 2.4.0 or greater of `ncvreg` (fixed error in
-  computing cross-validation folds)
+* Dependency changes:
+    * All dependencies imported instead of attached to the search path, except
+      `miscTools` which must be attached to provide the `margEff` generic
+    * `glmnet` 1.9-5 required (for parallel cross-validation)
+    * `ncvreg` 2.4-0 required (for bug fix in `cv.ncvreg`)
+    * `iterators` and `Rcpp` required
+    * `car` no longer required (but still suggested)
+    * `matrixStats` and `games` no longer required
 
 
 ## polywog 0.3-0 (January 2013)
