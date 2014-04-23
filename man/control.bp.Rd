@@ -2,37 +2,59 @@
 \alias{control.bp}
 \title{Auxiliary for bootstrap options}
 \usage{
-control.bp(reuse.lambda = FALSE, reuse.penwt = FALSE, maxtries = 1000,
-  min.prop = 0, report = FALSE, scad.maxit = 5000)
+control.bp(.parallel = FALSE, reuse.lambda = FALSE, reuse.penwt = FALSE,
+  nlambda = 100, lambda.min.ratio = 1e-04, nfolds = 10, thresh = NULL,
+  maxit = NULL, maxtries = 1000, min.prop = 0, report = FALSE)
 }
 \arguments{
+  \item{.parallel}{logical: whether to perform computations
+  in parallel using a backend registered with
+  \code{\link{foreach}}.}
+
   \item{reuse.lambda}{logical: whether to use the
   penalization parameter from the original fit
   (\code{TRUE}), or to cross-validate within each iteration
   (\code{FALSE}, default).}
 
   \item{reuse.penwt}{logical: whether to use the penalty
-  weights from the original dataset for adaptive LASSO
-  models (\code{TRUE}), or to re-calculate penalty weights
-  within each iteration (\code{FALSE}, default).}
+  weights from the original fit (\code{TRUE}), or to
+  re-calculate them within each iteration (\code{FALSE},
+  default).}
+
+  \item{nlambda}{number of values of the penalty factor to
+  examine in cross-validation, as in
+  \code{\link{polywog}}.}
+
+  \item{lambda.min.ratio}{ratio of the smallest value of
+  the penalty factor to the largest, as in
+  \code{\link{polywog}}.}
+
+  \item{nfolds}{number of cross-validation folds to use.}
+
+  \item{thresh}{convergence threshold, as in
+  \code{\link{polywog}}.  If \code{NULL}, use the default
+  value for the fitting method (1e-7 for the adaptive
+  LASSO, 1e-3 for SCAD).}
+
+  \item{maxit}{iteration limit for fitting, as in
+  \code{\link{polywog}}.  If \code{NULL}, use the default
+  value for the fitting method (100,000 for the adaptive
+  LASSO, 5,000 for SCAD).}
 
   \item{maxtries}{maximum number of attempts to generate a
   bootstrap sample with a non-collinear model matrix (often
   problematic with lopsided binary regressors) before
-  failing.}
+  stopping and issuing an error message.}
 
-  \item{min.prop}{for models with a binary response,
-  minimum proportion of non-modal outcome to ensure is
-  included in each bootstrap iteration (for example, set
-  \code{min.prop = 0.1} to throw out any bootstrap
-  iteration where less than 10 percent of the responses are
-  1's)}
+  \item{min.prop}{for models with a binary response
+  variable, minimum proportion of non-modal outcome to
+  ensure is included in each bootstrap iteration (for
+  example, set \code{min.prop = 0.1} to throw out any
+  bootstrap iteration where less than 10 percent or more
+  than 90 percent of the observations are 1's).}
 
   \item{report}{logical: whether to print a status bar.
   Not available if \code{.parallel = TRUE}.}
-
-  \item{scad.maxit}{maximum number of iterations for
-  \code{\link{ncvreg}} in SCAD models.}
 }
 \value{
 A list containing the function arguments.

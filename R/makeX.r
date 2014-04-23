@@ -21,6 +21,10 @@ makeX <- function(formula, mf)
     if (length(formula)[2] > 1)
         X <- cbind(X, model.matrix(formula, data = mf, rhs = 2))
     k_lin <- ncol(X) - k_expand
+    binary_cols <- apply(X, 2, function(a) all(a %in% 0:1))
 
-    structure(X, k_expand = k_expand, k_lin = k_lin)
+    structure(X,
+              k_expand = k_expand,
+              k_lin = k_lin,
+              binary_cols = binary_cols)
 }

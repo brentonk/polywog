@@ -6,6 +6,33 @@
 ============================================================
 
 
+polywog 0.4-0
+-------------
+
+* k-fold cross-validation can now be performed in parallel for adaptive LASSO
+  models, controlled via the `.parallel` argument of `polywog()`.  Parallel
+  computation of bootstrap iterations is now handled via the `.parallel`
+  argument of `bootPolywog()` or `control.bp()`.
+
+* Adds `model.matrix` and `model.frame` methods for objects of class
+  `"polywog"`
+
+* Polynomial expansions of the design matrix are now handled in C++, and
+  obsolete functions `polym2()` and `rawpoly()` have been removed
+
+* New arguments of `polywog()`:
+    * `lambda`, `nlambda`, and `lambda.min.ratio` for finer control of the
+      sequence of penalization factor values examined
+    * `foldid` for direct specification of cross-validation folds (only
+      available when fitting via the adaptive LASSO)
+    * `thresh` and `maxit` for finer control of the convergence criterion,
+      replacing old argument `scad.maxit`
+
+* Package now requires version 1.9.5 or greater of `glmnet` (for parallel
+  computation) and 2.4.0 or greater of `ncvreg` (fixed error in
+  computing cross-validation folds)
+
+
 polywog 0.3-0 (2013-01-09)
 --------------------------
 

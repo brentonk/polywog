@@ -2,15 +2,22 @@
 \alias{bootPolywog}
 \title{Bootstrap a fitted polywog model}
 \usage{
-bootPolywog(model, nboot = 100, reuse.lambda = FALSE, reuse.penwt = FALSE,
-  maxtries = 1000, min.prop = 0, report = FALSE, scad.maxit = 5000,
-  .parallel = FALSE, .matrixOnly = FALSE)
+bootPolywog(model, nboot = 100, .parallel = FALSE, reuse.lambda = FALSE,
+  reuse.penwt = FALSE, nlambda = 100, lambda.min.ratio = 1e-04,
+  nfolds = 10, thresh = NULL, maxit = NULL, maxtries = 1000,
+  min.prop = 0, report = FALSE, .matrixOnly = FALSE)
 }
 \arguments{
   \item{model}{a fitted model of class \code{"polywog"},
-  typically the output of \code{\link{polywog}}.}
+  typically the output of \code{\link{polywog}} or the
+  \code{"polywog.fit"} element of the output of
+  \code{\link{cv.polywog}}.}
 
   \item{nboot}{number of bootstrap iterations.}
+
+  \item{.parallel}{logical: whether to perform computations
+  in parallel using a backend registered with
+  \code{\link{foreach}}.}
 
   \item{reuse.lambda}{logical: whether to use the
   penalization parameter from the original fit
@@ -18,31 +25,44 @@ bootPolywog(model, nboot = 100, reuse.lambda = FALSE, reuse.penwt = FALSE,
   (\code{FALSE}, default).}
 
   \item{reuse.penwt}{logical: whether to use the penalty
-  weights from the original dataset for adaptive LASSO
-  models (\code{TRUE}), or to re-calculate penalty weights
-  within each iteration (\code{FALSE}, default).}
+  weights from the original fit (\code{TRUE}), or to
+  re-calculate them within each iteration (\code{FALSE},
+  default).}
+
+  \item{nlambda}{number of values of the penalty factor to
+  examine in cross-validation, as in
+  \code{\link{polywog}}.}
+
+  \item{lambda.min.ratio}{ratio of the smallest value of
+  the penalty factor to the largest, as in
+  \code{\link{polywog}}.}
+
+  \item{nfolds}{number of cross-validation folds to use.}
+
+  \item{thresh}{convergence threshold, as in
+  \code{\link{polywog}}.  If \code{NULL}, use the default
+  value for the fitting method (1e-7 for the adaptive
+  LASSO, 1e-3 for SCAD).}
+
+  \item{maxit}{iteration limit for fitting, as in
+  \code{\link{polywog}}.  If \code{NULL}, use the default
+  value for the fitting method (100,000 for the adaptive
+  LASSO, 5,000 for SCAD).}
 
   \item{maxtries}{maximum number of attempts to generate a
   bootstrap sample with a non-collinear model matrix (often
   problematic with lopsided binary regressors) before
-  failing.}
+  stopping and issuing an error message.}
 
-  \item{min.prop}{for models with a binary response,
-  minimum proportion of non-modal outcome to ensure is
-  included in each bootstrap iteration (for example, set
-  \code{min.prop = 0.1} to throw out any bootstrap
-  iteration where less than 10 percent of the responses are
-  1's)}
+  \item{min.prop}{for models with a binary response
+  variable, minimum proportion of non-modal outcome to
+  ensure is included in each bootstrap iteration (for
+  example, set \code{min.prop = 0.1} to throw out any
+  bootstrap iteration where less than 10 percent or more
+  than 90 percent of the observations are 1's).}
 
   \item{report}{logical: whether to print a status bar.
   Not available if \code{.parallel = TRUE}.}
-
-  \item{scad.maxit}{maximum number of iterations for
-  \code{\link{ncvreg}} in SCAD models.}
-
-  \item{.parallel}{logical: whether to parallelize
-  computation via \code{\link[foreach]{foreach}}; see
-  "Details" below.}
 
   \item{.matrixOnly}{logical: whether to return just the
   matrix of bootstrap coefficients (\code{TRUE}), or the
@@ -55,7 +75,7 @@ If \code{.matrixOnly = FALSE}, the returned object is
 \code{boot.matrix} element.  If \code{.matrixOnly = TRUE},
 just the matrix is returned.  In either case, the bootstrap
 matrix is a sparse matrix of class
-\code{"\link[=dgCMatrix-class]{dgCMatrix}"}.
+\code{"\linkS4class{dgCMatrix}"}.
 }
 \description{
 Nonparametric bootstrap of the \code{\link{polywog}}
@@ -64,17 +84,14 @@ regression procedure. Can be run on a fitted model of class
 \code{boot} argument.
 }
 \details{
-When \code{.parallel = TRUE}, parallel computation is
-performed via \code{\link[foreach:foreach]{\%dopar\%}}
-using the currently registered backend.  Typically this
-will be \pkg{doMC} on Mac/Unix, \pkg{doSMP} on Windows, and
-\pkg{doSNOW} in cluster environments.  Users must load the
-appropriate packages and register the parallel environment
-before calling \code{bootPolywog} (or \code{\link{polywog}}
-with \code{boot > 0}).  If a parallel backend is not
-registered but \code{.parallel = TRUE}, computation will
-proceed sequentially and \code{\%dopar\%} will issue a
-warning.
+Parallel computation via the \code{.parallel} argument
+requires registation of a backend for
+\code{\link[foreach:foreach]{\%dopar\%}}, as in
+\code{\link{polywog}}.  In the case of \code{bootPolywog},
+bootstrap fitting is carried out in parallel, while
+cross-validation to choose the penalization factor
+(assuming \code{reuse.lambda = FALSE}) is carried out
+sequentially within each iteration.
 }
 \examples{
 ## Using occupational prestige data

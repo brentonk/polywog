@@ -1,87 +1,47 @@
-##' Auxiliary for bootstrap options
-##'
-##' Used to pass options to \code{\link{bootPolywog}} when bootstrapping via the
-##' \code{boot} option of the main \code{\link{polywog}} function.
-##' @inheritParams bootPolywog
-##' @return A list containing the function arguments.
-##' @author Brenton Kenkel and Curtis S. Signorino
-##' @export
-control.bp <- function(reuse.lambda = FALSE, reuse.penwt = FALSE,
-                       maxtries = 1000, min.prop = 0, report = FALSE,
-                       scad.maxit = 5000)
-{
-    list(reuse.lambda = reuse.lambda, reuse.penwt = reuse.penwt,
-         maxtries = maxtries, report = report, scad.maxit = scad.maxit)
-}
-
-##
-## Innards of the bootstrap procedure
-##
-bootFit <- function(X, y, weights, family, lambda, penwt, method, penwt.method,
-                    unpenalized, nfolds, scad.maxit, pb, i)
-{
-    ## Calculate penalty weights unless specified
-    if (method == "alasso" && is.null(penwt)) {
-        if (family == "gaussian" || penwt.method == "lm") {
-            penwt <- lsfit(X, y, wt = weights, intercept = TRUE)$coef
-            penwt <- 1 / abs(penwt[-1])
-        } else {
-            penwt <- penaltyWeightsBinary(X, y, weights)
-        }
-
-        penwt[unpenalized] <- 0
-    }
-
-    ## Fit model on bootstrap data and catch any convergence errors
-    fitPolywog <- switch(method, alasso = fitALasso, scad = fitSCAD)
-    ans <- tryCatch(fitPolywog(X = X, y = y, weights = weights, family = family,
-                               penwt = penwt, lambda = lambda, nfolds = nfolds,
-                               scad.maxit = scad.maxit)$coef,
-                    error = identity)
-
-    ## Increment progress bar if specified
-    if(!is.null(pb))
-        setTxtProgressBar(pb, i)
-
-    return(ans)
-}
-
 ##' Bootstrap a fitted polywog model
 ##'
 ##' Nonparametric bootstrap of the \code{\link{polywog}} regression procedure.
 ##' Can be run on a fitted model of class \code{"polywog"}, or within the
 ##' original procedure via the \code{boot} argument.
 ##'
-##' When \code{.parallel = TRUE}, parallel computation is performed via
-##' \code{\link[foreach:foreach]{\%dopar\%}} using the currently registered
-##' backend.  Typically this will be \pkg{doMC} on Mac/Unix, \pkg{doSMP} on
-##' Windows, and \pkg{doSNOW} in cluster environments.  Users must load the
-##' appropriate packages and register the parallel environment before calling
-##' \code{bootPolywog} (or \code{\link{polywog}} with \code{boot > 0}).  If a
-##' parallel backend is not registered but \code{.parallel = TRUE}, computation
-##' will proceed sequentially and \code{\%dopar\%} will issue a warning.
+##' Parallel computation via the \code{.parallel} argument requires
+##' registation of a backend for \code{\link[foreach:foreach]{\%dopar\%}}, as
+##' in \code{\link{polywog}}.  In the case of \code{bootPolywog}, bootstrap
+##' fitting is carried out in parallel, while cross-validation to choose the
+##' penalization factor (assuming \code{reuse.lambda = FALSE}) is carried
+##' out sequentially within each iteration.
 ##' @param model a fitted model of class \code{"polywog"}, typically the output
-##' of \code{\link{polywog}}.
+##' of \code{\link{polywog}} or the \code{"polywog.fit"} element of the output
+##' of \code{\link{cv.polywog}}.
 ##' @param nboot number of bootstrap iterations.
+##' @param .parallel logical: whether to perform computations in parallel
+##' using a backend registered with \code{\link{foreach}}.
 ##' @param reuse.lambda logical: whether to use the penalization parameter from
 ##' the original fit (\code{TRUE}), or to cross-validate within each iteration
 ##' (\code{FALSE}, default).
 ##' @param reuse.penwt logical: whether to use the penalty weights from the
-##' original dataset for adaptive LASSO models (\code{TRUE}), or to re-calculate
-##' penalty weights within each iteration (\code{FALSE}, default).
+##' original fit (\code{TRUE}), or to re-calculate them within each iteration
+##' (\code{FALSE}, default).
+##' @param nlambda number of values of the penalty factor to examine in
+##' cross-validation, as in \code{\link{polywog}}.
+##' @param lambda.min.ratio ratio of the smallest value of the penalty factor
+##' to the largest, as in \code{\link{polywog}}.
+##' @param nfolds number of cross-validation folds to use.
+##' @param thresh convergence threshold, as in \code{\link{polywog}}.  If
+##' \code{NULL}, use the default value for the fitting method (1e-7 for the
+##' adaptive LASSO, 1e-3 for SCAD).
+##' @param maxit iteration limit for fitting, as in \code{\link{polywog}}.  If
+##' \code{NULL}, use the default value for the fitting method (100,000 for the
+##' adaptive LASSO, 5,000 for SCAD).
 ##' @param maxtries maximum number of attempts to generate a bootstrap sample
 ##' with a non-collinear model matrix (often problematic with lopsided binary
-##' regressors) before failing.
-##' @param min.prop for models with a binary response, minimum proportion of
+##' regressors) before stopping and issuing an error message.
+##' @param min.prop for models with a binary response variable, minimum proportion of
 ##' non-modal outcome to ensure is included in each bootstrap iteration (for
 ##' example, set \code{min.prop = 0.1} to throw out any bootstrap iteration
-##' where less than 10 percent of the responses are 1's)
+##' where less than 10 percent or more than 90 percent of the observations are 1's).
 ##' @param report logical: whether to print a status bar.  Not available if
 ##' \code{.parallel = TRUE}.
-##' @param scad.maxit maximum number of iterations for \code{\link{ncvreg}} in
-##' SCAD models.
-##' @param .parallel logical: whether to parallelize computation via
-##' \code{\link[foreach]{foreach}}; see "Details" below.
 ##' @param .matrixOnly logical: whether to return just the matrix of bootstrap
 ##' coefficients (\code{TRUE}), or the originally supplied model with the
 ##' bootstrap matrix as the \code{boot.matrix} element (\code{FALSE}, default).
@@ -89,121 +49,145 @@ bootFit <- function(X, y, weights, family, lambda, penwt, method, penwt.method,
 ##' with the bootstrap matrix included as its \code{boot.matrix} element.  If
 ##' \code{.matrixOnly = TRUE}, just the matrix is returned.  In either case, the
 ##' bootstrap matrix is a sparse matrix of class
-##' \code{"\link[=dgCMatrix-class]{dgCMatrix}"}.
+##' \code{"\linkS4class{dgCMatrix}"}.
 ##' @author Brenton Kenkel and Curtis S. Signorino
 ##' @export
 ##' @example inst/examples/bootPolywog.r
-bootPolywog <- function(model, nboot = 100, reuse.lambda = FALSE,
-                        reuse.penwt = FALSE, maxtries = 1000, min.prop = 0,
+##' @import foreach
+##' @import iterators
+##' @importFrom Matrix Matrix cBind
+bootPolywog <- function(model,
+                        nboot = 100,
+                        .parallel = FALSE,
+                        reuse.lambda = FALSE,
+                        reuse.penwt = FALSE,
+                        nlambda = 100,
+                        lambda.min.ratio = 1e-4,
+                        nfolds = 10,
+                        thresh = NULL,
+                        maxit = NULL,
+                        maxtries = 1000,
+                        min.prop = 0,
                         report = FALSE,
-                        scad.maxit = 5000,
-                        .parallel = FALSE, .matrixOnly = FALSE)
+                        .matrixOnly = FALSE)
 {
     ## Can't have a progress bar in parallel, sadly
     if (.parallel && report) {
         report <- FALSE
-        warning("'report' set to FALSE because parallelization enabled")
+        warning("Cannot print status bar when parallelization is enabled")
     }
 
-    ## Extract relevant information about initial fit
-    ncf <- length(coef(model))
-    formula <- model$formula
-    degree <- model$degree
-    family <- model$family
-    method <- model$method
-    penwt.method <- model$penwt.method
-    unpenalized <- model$unpenalized
-    pivot <- model$pivot
+    ## Check for bad argument combinations
+    if (model$method == "scad" && reuse.penwt)
+        warning("Argument 'reuse.penwt' is ignored when method = \"scad\"")
+
+    ## Obtain original model matrix and response variable
+    X <- model.matrix(model, type = "raw")
+    y <- model.response(model.frame(model))
     nobs <- model$nobs
+    w <- model$weights
+    if (is.null(w))
+        w <- rep(1L, nobs)
+    isBinary <- all(y %in% 0:1)
+
+    ## Reuse lambda if told to, otherwise set it to NULL so that fitPolywog()
+    ## will know to select it automatically via cross-validation
     lambda <- if (reuse.lambda) model$lambda else NULL
-    penwt <- if (reuse.penwt) model$penwt else NULL
-    nfolds <- model$nfolds
-    weights <- model$weights
-    if (is.null(weights))
-        weights <- rep(1, nobs)
 
-    ## Obtain original model matrix and response
-    if (!is.null(model$X)) {
-        X <- model$X
-    } else {
-        if (is.null(model$model))
-            stop("Fitted object must contain either 'model' or both 'X' and 'y'; re-run polywog with \"model = TRUE\"")
-        X <- makeX(formula, model$model, degree)[, pivot, drop = FALSE]
-    }
-    if (!is.null(model$y)) {
-        y <- model$y
-    } else {
-        if (is.null(model$model))
-            stop("Fitted object must contain either 'model' or both 'X' and 'y'; re-run polywog with \"model = TRUE\"")
-        y <- model.part(formula, model$model, lhs = 1, drop = TRUE)
-    }
-    isBinary <- length(unique(y)) <= 2
+    ## If not specified, set convergence tolerance and maximum iterations to
+    ## their defaults, depending on the type of model
+    if (is.null(thresh))
+        thresh <- ifelse(model$method == "alasso", 1e-7, 0.001)
+    if (is.null(maxit))
+        maxit <- ifelse(model$method == "alasso", 1e5, 5000)
 
-    ## Bootstrap iterations
-    pb <- if (report) txtProgressBar(min = 0, max = nboot) else NULL
+    ## Set up progress bar
+    pb <- txtProgressBar(min = 0, max = nboot)
 
-    ## Loop over bootstrap iterations
-    if (.parallel) {
-        ## Loop in parallel via 'foreach'
-        ans <- foreach (i = seq_len(nboot), .packages = "polywog") %dopar% {
-            tries <- 0
-            repeat {
-                ## Ensure that the bootstrap X matrix has the same rank as the
-                ## original one
-                tries <- tries + 1
-                if (tries > maxtries)
-                    stop("'maxtries' reached; no non-collinear bootstrap sample found")
-                ind <- sample(seq_len(nobs), nobs, replace = TRUE)
-                Xgood <- qr(cbind(1L, X[ind, , drop = FALSE]))$rank == ncf
-                ygood <- !isBinary || (mean(y[ind]) > min.prop &&
-                                       mean(1-y[ind]) > min.prop)
-                if (Xgood && ygood)
-                    break
+    ## Use foreach() to iterate, potentially in parallel
+    `%dofn%` <- if (.parallel) `%dopar%` else `%do%`
+    ans <- foreach (i = icount(nboot)) %dofn% {
+        tries <- 0
+
+        ## Inner loop: keep drawing indices until we get a dataset that is
+        ## linearly independent and passes the `min.prop` test (for binary
+        ## outcomes), or until we hit `maxtries`
+        repeat {
+            tries <- tries + 1
+            if (tries > maxtries) {
+                stop("'maxtries' reached; no suitable bootstrap sample was found")
             }
-            polywog:::bootFit(X = X[ind, , drop = FALSE], y = y[ind], weights =
-                    weights[ind], family = family, lambda = lambda, penwt =
-                    penwt, method = method, penwt.method = penwt.method,
-                    unpenalized = unpenalized,
-                    nfolds = nfolds, scad.maxit = scad.maxit, pb = pb, i = i)
-        }
-    } else {
-        ## Use a sequential 'for' loop
-        ans <- vector("list", nboot)
-        for (i in seq_len(nboot)) {
-            tries <- 0
-            repeat {
-                ## Ensure that the bootstrap X matrix has the same rank as the
-                ## original one
-                tries <- tries + 1
-                if (tries > maxtries)
-                    stop("'maxtries' reached; no non-collinear bootstrap sample found")
-                ind <- sample(seq_len(nobs), nobs, replace = TRUE)
-                if (qr(cbind(1L, X[ind, , drop = FALSE]))$rank == ncf)
-                    break
+
+            ind <- sample(seq_len(nobs), size = nobs, replace = TRUE)
+
+            ## If the dependent variable is binary, check that it doesn't have
+            ## too many 0s or 1s, as specified by the user
+            meanY <- if (isBinary) mean(y[ind]) else NULL
+            if (isBinary && (meanY < min.prop || 1 - meanY < min.prop)) {
+                next
             }
-            ans[[i]] <-
-                bootFit(X = X[ind, , drop = FALSE], y = y[ind], weights =
-                        weights[ind], family = family, lambda = lambda, penwt =
-                        penwt, method = method, penwt.method = penwt.method,
-                        unpenalized = unpenalized,
-                        nfolds = nfolds, scad.maxit = scad.maxit, pb = pb, i = i)
+
+            ## Compute the linear model coefficients and check for
+            ## collinearity
+            lmcoef <- tryCatch(computeLinearCoef(X = X[ind, , drop = FALSE],
+                                                 y = y[ind],
+                                                 polyTerms = model$polyTerms,
+                                                 weights = w[ind],
+                                                 allowRankDeficient = FALSE),
+                               error = identity)
+            if (!inherits(lmcoef, "error")) {
+                break
+            }
         }
+
+        ## Reuse or compute penalty weights
+        if (reuse.penwt) {
+            penwt <- model$penwt
+        } else {
+            penwt <- computePenaltyWeights(X = X[ind, , drop = FALSE],
+                                           y = y[ind],
+                                           weights = w[ind],
+                                           polyTerms = model$polyTerms,
+                                           lmcoef = lmcoef,
+                                           method = model$method,
+                                           penwt.method = model$penwt.method,
+                                           family = model$family,
+                                           unpenalized = model$unpenalized)
+        }
+
+        ## Compute model fit
+        fitPolywog <- switch(model$method,
+                             alasso = fitAdaptiveLASSO,
+                             scad = fitSCAD)
+        fit <- fitPolywog(X = X[ind, , drop = FALSE],
+                          y = y[ind],
+                          weights = w[ind],
+                          polyTerms = model$polyTerms,
+                          family = model$family,
+                          penwt = penwt,
+                          lambda = lambda,
+                          nlambda = nlambda,
+                          lambda.min.ratio = lambda.min.ratio,
+                          nfolds = nfolds,
+                          foldid = NULL,
+                          thresh = thresh,
+                          maxit = maxit,
+                          .parallel = FALSE)
+
+        if (report)
+            setTxtProgressBar(pb, i)
+
+        Matrix(fit$coef, sparse = TRUE)
     }
 
-    if (report)  # Print newline after progress bar completes
+    ## Print newline after progress bar completes
+    if (report)
         cat("\n")
 
-    ## Warn about failures
-    failures <- sapply(ans, function(x) inherits(x, "error"))
-    if (sum(failures) > 0) {
-        warning(sum(failures),
-                " bootstrap iterations failed to converge and were removed",
-                if (reuse.lambda) "; try setting 'reuse.lambda' to FALSE")
-    }
-
-    ## Store results in sparse matrix
-    ans <- do.call(rbind, ans[!failures])
-    ans <- Matrix(ans, sparse = TRUE)
+    ## Construct the bootstrap matrix, with each column being a set of
+    ## coefficients (*not* each row as in v0.3.0 and earlier)
+    ans <- do.call(cBind, ans)
+    rownames(ans) <- names(coef(model))
 
     ## If .matrixOnly (typically only used within 'polywog'), return only the
     ## bootstrap matrix itself; otherwise, return the original model object with
@@ -214,4 +198,37 @@ bootPolywog <- function(model, nboot = 100, reuse.lambda = FALSE,
         model$boot.matrix <- ans
         return(model)
     }
+}
+
+##' Auxiliary for bootstrap options
+##'
+##' Used to pass options to \code{\link{bootPolywog}} when bootstrapping via the
+##' \code{boot} option of the main \code{\link{polywog}} function.
+##' @inheritParams bootPolywog
+##' @return A list containing the function arguments.
+##' @author Brenton Kenkel and Curtis S. Signorino
+##' @export
+control.bp <- function(.parallel = FALSE,
+                       reuse.lambda = FALSE,
+                       reuse.penwt = FALSE,
+                       nlambda = 100,
+                       lambda.min.ratio = 1e-4,
+                       nfolds = 10,
+                       thresh = NULL,
+                       maxit = NULL,
+                       maxtries = 1000,
+                       min.prop = 0,
+                       report = FALSE)
+{
+    list(.parallel = .parallel,
+         reuse.lambda = reuse.lambda,
+         reuse.penwt = reuse.penwt,
+         nlambda = nlambda,
+         lambda.min.ratio = lambda.min.ratio,
+         nfolds = nfolds,
+         thresh = thresh,
+         maxit = maxit,
+         maxtries = maxtries,
+         min.prop = min.prop,
+         report = report)
 }

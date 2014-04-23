@@ -1,21 +1,16 @@
-## Undocumented "helper" functions
-
 ##
 ## Calculate penalty weights via logistic regression for adaptive lasso with
 ## binary outcomes
 ##
-## ARGUMENTS:
-##   X: polynomial expansion of covariate matrix (without intercept)
-##   y: response variable
-##   weights: vector of observation weights
-##
-## RETURN:
-##   numeric vector of penalty weights for coefficients
-##
-penaltyWeightsBinary <- function(X, y, weights)
+penaltyWeightsBinary <- function(X, y, polyTerms, weights)
 {
+    ## Compute polynomial-expanded model matrix
+    X.expand <- expandMatrix(X, polyTerms, intercept = TRUE)
+
     ## Compute coefficients
-    ans <- suppressWarnings(glm.fit(x = cbind(1L, X), y = y, weights = weights,
+    ans <- suppressWarnings(glm.fit(x = X.expand,
+                                    y = y,
+                                    weights = weights,
                                     family = binomial()))
 
     ## Separation check and convergence check (same as in 'glm.fit', but with

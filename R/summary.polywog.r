@@ -19,7 +19,7 @@
 ##' @author Brenton Kenkel and Curtis S. Signorino
 ##' @method summary polywog
 ##' @export
-##' @importMethodsFrom Matrix colMeans
+##' @importMethodsFrom Matrix rowMeans
 summary.polywog <- function(object, level = .95, prop0 = FALSE, ...)
 {
     ans <- list()
@@ -30,8 +30,8 @@ summary.polywog <- function(object, level = .95, prop0 = FALSE, ...)
     ans$coefficients <- cbind("Estimate" = cf, "Std. Error" = se)
     if (!is.null(object$boot.matrix)) {
         q <- 0.5 - (level/2)
-        interval <- apply(object$boot.matrix, 2, quantile, probs = c(q, 1-q))
-        p0 <- colMeans(object$boot.matrix == 0)
+        interval <- apply(object$boot.matrix, 1, quantile, probs = c(q, 1-q))
+        p0 <- rowMeans(object$boot.matrix == 0)
         ans$coefficients <- cbind(ans$coefficients, t(interval),
                                   "Prop. 0" = if (prop0) p0)
     }
@@ -44,7 +44,7 @@ summary.polywog <- function(object, level = .95, prop0 = FALSE, ...)
     ans$penwt.method <- object$penwt.method
     ans$nobs <- object$nobs
     ans$nboot <-
-        if (!is.null(object$boot.matrix)) nrow(object$boot.matrix) else 0
+        if (!is.null(object$boot.matrix)) ncol(object$boot.matrix) else 0
     ans$lambda <- object$lambda
 
     class(ans) <- "summary.polywog"

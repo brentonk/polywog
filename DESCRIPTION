@@ -10,12 +10,13 @@ Description: Routines for flexible functional form estimation via basis
 License: GPL (>= 2)
 Depends:
     foreach,
-    glmnet (>= 1.5.1),
-    ncvreg,
+    glmnet (>= 1.9.5),
+    ncvreg (>= 2.4.0),
     Formula,
     Matrix,
     miscTools
 Imports:
+    iterators,
     stringr,
     Rcpp (>= 0.11.0)
 LinkingTo: Rcpp
