@@ -184,7 +184,7 @@ NULL
 ##'
 ##' Adaptive LASSO estimates are provided via \code{\link{glmnet}} and
 ##' \code{\link{cv.glmnet}} from the \pkg{glmnet} package.  SCAD estimates are
-##' via \code{\link{cv.ncvreg}} and \code{\link{ncvreg}} in the \pkg{ncvreg}
+##' via \code{\link{ncvreg}} and \code{\link{cv.ncvreg}} in the \pkg{ncvreg}
 ##' package.
 ##' @references Brenton Kenkel and Curtis S. Signorino.  2012.  "A Method for
 ##' Flexible Functional Form Estimation: Bootstrapped Basis Regression with
