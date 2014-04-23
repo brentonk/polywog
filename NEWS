@@ -9,6 +9,16 @@
 polywog 0.4-0
 -------------
 
+* `predVals()` has been rewritten to compute fitted values according to the
+  "observed value" approach advocated in the following article:
+
+  > Hanmer, M. J. and Ozan Kalkan, K. (2013), Behind the Curve: Clarifying the
+  > Best Approach to Calculating Predicted Probabilities and Marginal Effects
+  > from Limited Dependent Variable Models. *American Journal of Political
+  > Science*, 57: 263--277. doi: 10.1111/j.1540-5907.2012.00602.x
+
+  For more details, see `?predVals`.
+
 * k-fold cross-validation can now be performed in parallel for adaptive LASSO
   models, controlled via the `.parallel` argument of `polywog()`.  Parallel
   computation of bootstrap iterations is now handled via the `.parallel`
