@@ -3,7 +3,7 @@
 ##' @title Model frame of a polywog model
 ##' @param formula a fitted model of class \code{"polywog"} (the argument is
 ##' named \code{formula} for consistency with the generic function
-##' \code{\link{model.frame}}
+##' \code{\link{model.frame}})
 ##' @param ... other arguments, currently ignored (but may later be adapted
 ##' for use as in \code{\link{model.frame.lm}})
 ##' @return A data frame containing the variables used to fit the model, with

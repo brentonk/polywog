@@ -7,7 +7,7 @@
 \arguments{
   \item{formula}{a fitted model of class \code{"polywog"}
   (the argument is named \code{formula} for consistency
-  with the generic function \code{\link{model.frame}}}
+  with the generic function \code{\link{model.frame}})}
 
   \item{...}{other arguments, currently ignored (but may
   later be adapted for use as in
