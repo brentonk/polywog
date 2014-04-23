@@ -3,3 +3,6 @@ archive/*
 
 # Local test files
 test.local/*
+
+# NEWS file (since CRAN dislikes Markdown format)
+NEWS.md
