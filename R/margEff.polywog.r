@@ -14,7 +14,7 @@
 ##' @param xvar a character string containing the name of a raw input variable
 ##' (from \code{object$varNames}).  Partial matches are allowed.
 ##' @param drop logical: whether to convert one-column matrices in the output to
-##' vectors (see Details).
+##' vectors.
 ##' @param ... other arguments, currently ignored.
 ##' @return If \code{xvar} is specified, a numeric object containing
 ##' the marginal effect of the chosen variable at each observation in

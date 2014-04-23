@@ -15,7 +15,7 @@
   Partial matches are allowed.}
 
   \item{drop}{logical: whether to convert one-column
-  matrices in the output to vectors (see Details).}
+  matrices in the output to vectors.}
 
   \item{...}{other arguments, currently ignored.}
 }
