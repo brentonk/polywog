@@ -1,50 +1,42 @@
 \name{cv.polywog}
 \alias{cv.polywog}
-\title{Cross-validation for polywog models}
+\title{Cross-validation of polynomial degree and penalization factor}
 \usage{
-cv.polywog(formula, ..., method = c("alasso", "scad"), model = TRUE,
-  X = FALSE, y = FALSE, degrees.cv = 1:3, nfolds = 10,
-  scad.maxit = 5000)
+cv.polywog(formula, ..., degrees.cv = 1:3, nfolds = 10, model = TRUE,
+  X = FALSE, y = FALSE)
 }
 \arguments{
   \item{formula}{model formula specifying the response and
   input variables.}
 
   \item{...}{other arguments to be passed to
-  \code{\link{polywog}}.  Arguments controlling the
-  bootstrap will be ignored.}
-
-  \item{method}{variable selection method: \code{"alasso"}
-  (default) for adaptive LASSO or \code{"scad"} for SCAD.}
-
-  \item{model}{logical: whether to include the model frame
-  in the returned object (default \code{TRUE}).  It may be
-  problematic to run \code{\link{predVals}} or
-  \code{\link{bootPolywog}} on a polywog object fit with
-  \code{model = FALSE}.}
-
-  \item{X}{logical: whether to include the
-  polynomial-expanded design matrix in the returned object
-  (default \code{FALSE}).}
-
-  \item{y}{logical: whether to include the response
-  variable in the returned object (default \code{FALSE}).}
+  \code{\link{polywog}}.  Arguments related to the
+  bootstrap will be ignored, as bootstrapping must be
+  performed separately.}
 
   \item{degrees.cv}{vector of polynomial degrees to examine
   via cross-validation.}
 
-  \item{nfolds}{number of folds to use in cross-validation
-  to select the penalization parameter.}
+  \item{nfolds}{number of folds to use in
+  cross-validation.}
 
-  \item{scad.maxit}{maximum number of iterations when
-  \code{method = "scad"} (see \code{\link{ncvreg}});
-  ignored when \code{method = "alasso"}.}
+  \item{model}{logical: whether to include the model frame
+  in the \code{"polywog"} object included in the output.}
+
+  \item{X}{logical: whether to include the raw model matrix
+  (i.e., the matrix of input variables prior to taking
+  their polynomial expansion) in the \code{"polywog"}
+  object included in the output.}
+
+  \item{y}{logical: whether to include the response
+  variable in the \code{"polywog"} object included in the
+  output.}
 }
 \value{
 An object of class \code{"cv.polywog"}, a list containing:
 \describe{ \item{\code{results}}{A table of each degree
-tested, the optimal penalization parameter \eqn{\lambda}
-for that degree, and its cross-validation error.}
+tested, the optimal penalization factor \eqn{\lambda} for
+that degree, and its cross-validation error.}
 \item{\code{degree.min}}{The polynomial degree giving the
 lowest cross-validation error.} \item{\code{polywog.fit}}{A
 \code{\link{polywog}} model, fit at the polynomial degree
@@ -53,15 +45,24 @@ giving the lowest cross-validation error.} }
 Because the returned object contains the fitted polywog
 model for the optimal degree, no additional runs of
 \code{\link{polywog}} are necessary to estimate
-coefficients or the penalization parameter \eqn{\lambda}.
-However, bootstrap coefficients must be obtained by running
+coefficients or the penalization factor \eqn{\lambda}.
+However, bootstrap results must be obtained by running
 \code{\link{bootPolywog}} on the \code{"polywog.fit"}
 element of the returned object, as in the examples below.
 }
 \description{
-Uses k-fold cross-validation to select the polynomial
-degree and penalization parameter for a
-\code{\link{polywog}} model.
+k-fold cross-validation to select the polynomial degree and
+penalization factor for a \code{\link{polywog}} model.
+}
+\details{
+When fitting with \code{method = "scad"}, different fold
+assignments are used for each polynomial degree specified,
+because \code{\link{cv.ncvreg}} does not allow for custom
+fold assignments.  This may affect the accuracy of the
+estimated cross-validation error for each degree.  When
+\code{method = "scad"}, the calls to \code{\link{polywog}}
+made by \code{cv.polywog} will issue warnings that the
+\code{foldid} argument is being ignored.
 }
 \examples{
 ## Using occupational prestige data

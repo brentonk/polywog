@@ -1,30 +1,37 @@
-##' Cross-validation for polywog models
+## Declare `d` as a global variable so R CMD check doesn't complain about the
+## foreach loop
+if (getRversion() >= "2.15.1")
+    utils::globalVariables("d")
+
+##' k-fold cross-validation to select the polynomial degree and penalization
+##' factor for a \code{\link{polywog}} model.
 ##'
-##' Uses k-fold cross-validation to select the polynomial degree and
-##' penalization parameter for a \code{\link{polywog}} model.
+##' When fitting with \code{method = "scad"}, different fold assignments are
+##' used for each polynomial degree specified, because \code{\link{cv.ncvreg}}
+##' does not allow for custom fold assignments.  This may affect the accuracy
+##' of the estimated cross-validation error for each degree.  When
+##' \code{method = "scad"}, the calls to \code{\link{polywog}} made by
+##' \code{cv.polywog} will issue warnings that the \code{foldid} argument is
+##' being ignored.
+##' @title Cross-validation of polynomial degree and penalization factor
 ##' @param formula model formula specifying the response and input variables.
 ##' @param ... other arguments to be passed to \code{\link{polywog}}.  Arguments
-##' controlling the bootstrap will be ignored.
-##' @param method variable selection method: \code{"alasso"} (default) for
-##' adaptive LASSO or \code{"scad"} for SCAD.
-##' @param model logical: whether to include the model frame in the returned
-##' object (default \code{TRUE}).  It may be problematic to run
-##' \code{\link{predVals}} or \code{\link{bootPolywog}} on a polywog object fit
-##' with \code{model = FALSE}.
-##' @param X logical: whether to include the polynomial-expanded design matrix
-##' in the returned object (default \code{FALSE}).
-##' @param y logical: whether to include the response variable in the returned
-##' object (default \code{FALSE}).
+##' related to the bootstrap will be ignored, as bootstrapping must be
+##' performed separately.
 ##' @param degrees.cv vector of polynomial degrees to examine via
 ##' cross-validation.
-##' @param nfolds number of folds to use in cross-validation to select the
-##' penalization parameter.
-##' @param scad.maxit maximum number of iterations when \code{method = "scad"}
-##' (see \code{\link{ncvreg}}); ignored when \code{method = "alasso"}.
+##' @param nfolds number of folds to use in cross-validation.
+##' @param model logical: whether to include the model frame in the
+##' \code{"polywog"} object included in the output.
+##' @param X logical: whether to include the raw model matrix (i.e., the
+##' matrix of input variables prior to taking their polynomial expansion) in
+##' the \code{"polywog"} object included in the output.
+##' @param y logical: whether to include the response variable in the
+##' \code{"polywog"} object included in the output.
 ##' @return An object of class \code{"cv.polywog"}, a list containing:
 ##' \describe{
 ##'   \item{\code{results}}{A table of each degree tested, the optimal
-##' penalization parameter \eqn{\lambda} for that degree, and its
+##' penalization factor \eqn{\lambda} for that degree, and its
 ##' cross-validation error.}
 ##'   \item{\code{degree.min}}{The polynomial degree giving the lowest
 ##' cross-validation error.}
@@ -33,100 +40,97 @@
 ##' }
 ##'
 ##' Because the returned object contains the fitted polywog model for the
-##' optimal degree, no additional runs of \code{\link{polywog}} are necessary to
-##' estimate coefficients or the penalization parameter \eqn{\lambda}.  However,
-##' bootstrap coefficients must be obtained by running \code{\link{bootPolywog}}
-##' on the \code{"polywog.fit"} element of the returned object, as in the
-##' examples below.
+##' optimal degree, no additional runs of \code{\link{polywog}} are necessary
+##' to estimate coefficients or the penalization factor \eqn{\lambda}.
+##' However, bootstrap results must be obtained by running
+##' \code{\link{bootPolywog}} on the \code{"polywog.fit"} element of the
+##' returned object, as in the examples below.
 ##' @author Brenton Kenkel and Curtis S. Signorino
 ##' @export
 ##' @example inst/examples/cv.polywog.r
+##' @import foreach
 cv.polywog <- function(formula,
                        ...,
-                       method = c("alasso", "scad"),
-                       model = TRUE, X = FALSE, y = FALSE,
                        degrees.cv = 1:3,
-                       nfolds = 10, scad.maxit = 5000)
+                       nfolds = 10,
+                       model = TRUE,
+                       X = FALSE,
+                       y = FALSE)
 {
     cl <- match.call()
-    method <- match.arg(method)
 
-    cvfit <- switch(method, alasso = cvALasso, scad = cvSCAD)
+    ## Assign cross-validation folds
+    ##
+    ## Unfortunately, this requires knowing the number of observations in the
+    ## dataset in advance.  We could do a trial run of polywog() with high
+    ## tolerance/low maxit to get that, but that still entails taking the QR
+    ## decomposition of the model matrix to check for singularities, which can
+    ## be costly with large N.  So instead we form (and immediately discard)
+    ## the model frame.
+    if (nfolds < 2)
+        stop("'nfolds' must be at least 2")
+    formula <- as.Formula(formula)
+    nobs <- match(c("data", "subset", "na.action"), names(cl), 0L)
+    nobs <- cl[c(1L, nobs)]
+    nobs$formula <- formula
+    nobs[[1]] <- quote(stats::model.frame)
+    nobs <- nrow(eval(nobs, parent.frame()))
+    foldid <- sample(seq_len(nfolds), size = nobs, replace = TRUE)
 
-    ## Loop over each degree to be considered
-    ans <- calls <- vector("list", length(degrees.cv))
-    for (i in seq_along(degrees.cv)) {
-        d <- degrees.cv[i]
+    ## Run polywog() on each of the specified degrees
+    polyFits <- foreach(d = degrees.cv) %do% {
+        ## Construct a call to polywog() using the specified degree
+        ##
+        ## It would be possible to instead do this via
+        ##
+        ##   dots <- list(...)
+        ##   dots$formula <- formula
+        ##   dots$degree <- d
+        ##   ## etc
+        ##   do.call("polywog", dots)
+        ##
+        ## but then the "call" element of the fitted model would contain the
+        ## evaluated arguments instead of their names, so printing it or
+        ## calling summary() on it would end up printing the entire dataset
+        ## used to fit the model
+        polyCall <- cl
+        polyCall$degree <- d
+        polyCall$foldid <- foldid
+        polyCall$degrees.cv <- polyCall$nfolds <- NULL
+        polyCall$boot <- 0
+        polyCall$model <- polyCall$X <- polyCall$y <- FALSE
+        polyCall[[1]] <- quote(polywog)
 
-        ## Use the 'polywog' function with method = "none" to extract the model
-        ## matrix, penalty weights, and any other relevant info.  Need to call
-        ## the function from here or else the arguments in '...' get messed up
-        fit <- match(names(formals(polywog)), names(cl), 0L)
-        fit <- cl[c(1L, fit)]
-        fit$degree <- d
-        fit$model <- FALSE
-        fit$X <- TRUE
-        fit$y <- TRUE
-        fit$method <- "none"
-        fit[[1]] <- as.name("polywog")
-        calls[[i]] <- fit  # save so can call the best one again later
-        fit <- eval(fit, parent.frame())
-
-        ## In the first iteration, randomly assign cross-validation folds
-        ## (this is done inside the loop so we can access the number of
-        ## observations from the fitted polywog object)
-        if (i == 1L) {
-            n <- fit$nobs
-            foldid <- sample(rep(seq_len(nfolds), length.out = n))
-        }
-
-        ## Cross-validate and store results
-        ans[[i]] <- cvfit(X = fit$X, y = fit$y,
-                          weights = if (!is.null(fit$weights)) fit$weights
-                          else rep(1, n),
-                          family = fit$family, penwt = fit$penwt,
-                          nfolds = nfolds, foldid = foldid,
-                          scad.maxit = scad.maxit)
-
-        ## Save memory
-        rm(fit)
+        eval(polyCall, parent.frame())
     }
 
-    ## Table of minimal cross-validation error by degrees
-    tab <- t(sapply(ans, "[", c("lambda", "cverr")))
-    tab <- cbind(degrees.cv, tab)
-    colnames(tab) <- c("degree", "lambda.min", "cverr")
-    best <- which.min(tab[, "cverr"])
+    ## Construct table of optimal lambda and minimal MSE by degree
+    results <- cbind(degree = degrees.cv,
+                     lambda.min = sapply(polyFits, "[[", "lambda"),
+                     cv.err = sapply(polyFits, function(x) x$lambda.cv$errorMin))
 
-    ## Create the fitted polywog object from the degree with minimal
-    ## cross-validation error.  Could have saved each one created within the
-    ## loop and then chosen, but that would add a lot of memory use for little
-    ## computational speedup.
-    polywog.fit <- calls[[best]]
-    polywog.fit$model <- model
-    polywog.fit$X <- TRUE  # to make fitted values
-    polywog.fit$y <- y
-    polywog.fit$model <- model
-    polywog.fit$degree <- degrees.cv[best]
-    polywog.fit <- eval(polywog.fit, parent.frame())
-    polywog.fit$coefficients <- ans[[best]]$coef
-    polywog.fit$lambda <- ans[[best]]$lambda
-    polywog.fit$fitted.values <-
-        drop(cbind(1L, polywog.fit$X) %*% ans[[best]]$coef)
-    if (polywog.fit$family == "binomial")
-        polywog.fit$fitted.values <- plogis(polywog.fit$fitted.values)
-    if (!X) {
-        polywog.fit$X <- NULL
-        polywog.fit$call$X <- FALSE
+    ## Find the optimal degree
+    indMin <- which.min(results[, "cv.err"])
+    degreeMin <- degrees.cv[indMin]
+
+    ## Construct the fitted model object corresponding to the optimal degree
+    fitMin <- polyFits[[indMin]]
+    fitMin$call$foldid <- NULL
+    if (model) {
+        fitMin$model <- model.frame(fitMin)
+        fitMin$call$model <- TRUE
     }
-    polywog.fit$method <- method
-    polywog.fit$call$method <- method
-    if (method == "scad") {
-        polywog.fit$penwt <- NULL
-        polywog.fit$penwt.method <- NULL
+    if (X) {
+        fitMin$X <- model.matrix(fitMin)
+        fitMin$call$X <- TRUE
+    }
+    if (y) {
+        fitMin$y <- model.response(model.frame(fitMin))
+        fitMin$call$y <- TRUE
     }
 
-    ans <- list(results = tab, degree.min = best, polywog.fit = polywog.fit)
-    class(ans) <- "cv.polywog"
-    ans
+    structure(list(results = results,
+                   degree.min = degreeMin,
+                   polywog.fit = fitMin),
+              class = "cv.polywog")
 }
