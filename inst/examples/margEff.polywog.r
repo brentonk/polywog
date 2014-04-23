@@ -3,8 +3,13 @@ data(Prestige, package = "car")
 Prestige <- transform(Prestige, income = income / 1000)
 
 ## Fit a polywog model
+## (note: using low convergence threshold to shorten computation time of the
+## example, *not* recommended in practice!)
 set.seed(22)
-fit1 <- polywog(prestige ~ education + income | type, data = Prestige)
+fit1 <- polywog(prestige ~ education + income | type,
+                data = Prestige,
+                degree = 2,
+                thresh = 1e-4)
 
 ## Compute marginal effects for all variables
 me1 <- margEff(fit1)
