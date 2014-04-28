@@ -24,7 +24,7 @@ The statistical methods implemented in `polywog` are documented and applied in
 the following working papers:
 
 * ["Bootstrapped Basis Regression with Variable Selection: A New Method for
-Flexible Functional Form Estimation"](http://www.rochester.edu/College/gradstudents/bkenkel/data/basics.pdf)
+Flexible Functional Form Estimation"](http://bkenkel.com/data/basics.pdf)
 
 * ["An Alternative Solution to the Heckman Selection Problem: Selection Bias as Functional Form Misspecification"](http://polmeth.wustl.edu/mediaDetail.php?docId=1359)
 
