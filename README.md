@@ -9,9 +9,16 @@ version of the package
 [from CRAN](http://cran.r-project.org/web/packages/polywog/index.html) by
 running
 
-    install.packages("polywog")
+```r
+install.packages("polywog")
+```
 
 in an R console.
+
+To request a feature or report a bug, please visit the package's [project page
+on Github](https://github.com/brentonk/polywog-package).  The package's
+[change log](https://github.com/brentonk/polywog-package/blob/master/NEWS.md)
+can also be viewed there.
 
 The statistical methods implemented in `polywog` are documented and applied in
 the following working papers:

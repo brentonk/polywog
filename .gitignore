@@ -1,2 +1,13 @@
 # Package builds
 *.tar.gz
+
+# Rcpp object files
+src/*.o
+src/*.so
+
+# R data and history
+.RData
+.Rhistory
+
+# R CMD check output
+polywog.Rcheck/

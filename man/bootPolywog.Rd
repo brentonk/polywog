@@ -1,0 +1,141 @@
+\name{bootPolywog}
+\alias{bootPolywog}
+\alias{control.bp}
+\title{Bootstrap a fitted polywog model}
+\usage{
+bootPolywog(model, nboot = 100, .parallel = FALSE, reuse.lambda = FALSE,
+  reuse.penwt = FALSE, nlambda = 100, lambda.min.ratio = 1e-04,
+  nfolds = 10, thresh = NULL, maxit = NULL, maxtries = 1000,
+  min.prop = 0, report = FALSE, .matrixOnly = FALSE)
+
+control.bp(.parallel = FALSE, reuse.lambda = FALSE, reuse.penwt = FALSE,
+  nlambda = 100, lambda.min.ratio = 1e-04, nfolds = 10, thresh = NULL,
+  maxit = NULL, maxtries = 1000, min.prop = 0, report = FALSE)
+}
+\arguments{
+  \item{model}{a fitted model of class \code{"polywog"},
+  typically the output of \code{\link{polywog}} or the
+  \code{"polywog.fit"} element of the output of
+  \code{\link{cv.polywog}}.}
+
+  \item{nboot}{number of bootstrap iterations.}
+
+  \item{.parallel}{logical: whether to perform computations
+  in parallel using a backend registered with
+  \code{\link{foreach}}.}
+
+  \item{reuse.lambda}{logical: whether to use the
+  penalization parameter from the original fit
+  (\code{TRUE}), or to cross-validate within each iteration
+  (\code{FALSE}, default).}
+
+  \item{reuse.penwt}{logical: whether to use the penalty
+  weights from the original fit (\code{TRUE}), or to
+  re-calculate them within each iteration (\code{FALSE},
+  default).}
+
+  \item{nlambda}{number of values of the penalty factor to
+  examine in cross-validation, as in
+  \code{\link{polywog}}.}
+
+  \item{lambda.min.ratio}{ratio of the smallest value of
+  the penalty factor to the largest, as in
+  \code{\link{polywog}}.}
+
+  \item{nfolds}{number of cross-validation folds to use.}
+
+  \item{thresh}{convergence threshold, as in
+  \code{\link{polywog}}.  If \code{NULL}, use the same
+  value as in the original model.}
+
+  \item{maxit}{iteration limit for fitting, as in
+  \code{\link{polywog}}.  If \code{NULL}, use the same
+  value as in the original model.}
+
+  \item{maxtries}{maximum number of attempts to generate a
+  bootstrap sample with a non-collinear model matrix (often
+  problematic with lopsided binary regressors) before
+  stopping and issuing an error message.}
+
+  \item{min.prop}{for models with a binary response
+  variable, minimum proportion of non-modal outcome to
+  ensure is included in each bootstrap iteration (for
+  example, set \code{min.prop = 0.1} to throw out any
+  bootstrap iteration where less than 10 percent or more
+  than 90 percent of the observations are 1's).}
+
+  \item{report}{logical: whether to print a status bar.
+  Not available if \code{.parallel = TRUE}.}
+
+  \item{.matrixOnly}{logical: whether to return just the
+  matrix of bootstrap coefficients (\code{TRUE}), or the
+  originally supplied model with the bootstrap matrix as
+  the \code{boot.matrix} element (\code{FALSE}, default).}
+}
+\value{
+If \code{.matrixOnly = FALSE}, the returned object is
+\code{model} with the bootstrap matrix included as its
+\code{boot.matrix} element.  If \code{.matrixOnly = TRUE},
+just the matrix is returned.  In either case, the bootstrap
+matrix is a sparse matrix of class
+\code{"\linkS4class{dgCMatrix}"}.
+}
+\description{
+Nonparametric bootstrap of the \code{\link{polywog}}
+regression procedure. Can be run on a fitted model of class
+\code{"polywog"}, or within the original procedure via the
+\code{boot} argument.  The function \code{control.bp} can
+be used to pass options to \code{bootPolywog} when
+bootstrapping within \code{\link{polywog}}.
+}
+\details{
+Parallel computation via the \code{.parallel} argument
+requires registation of a backend for
+\code{\link[foreach:foreach]{\%dopar\%}}, as in
+\code{\link{polywog}}.  In the case of \code{bootPolywog},
+bootstrap fitting is carried out in parallel, while
+cross-validation to choose the penalization factor
+(assuming \code{reuse.lambda = FALSE}) is carried out
+sequentially within each iteration.
+}
+\examples{
+## Using occupational prestige data
+data(Prestige, package = "car")
+Prestige <- transform(Prestige, income = income / 1000)
+
+## Fit a polywog model without bootstrapping
+## (note: using low convergence threshold to shorten computation time of the
+## example, *not* recommended in practice!)
+fit1 <- polywog(prestige ~ education + income + type,
+                data = Prestige,
+                degree = 2,
+                thresh = 1e-4)
+summary(fit1)
+
+## Bootstrap the fitted model
+fit2 <- bootPolywog(fit1, nboot = 5)
+summary(fit2)
+
+## Example of parallel processing on Mac/Unix via 'doMC'
+\dontrun{
+library(doMC)
+registerDoMC()
+
+fit2 <- bootPolywog(fit1, nboot = 100, .parallel = TRUE)
+}
+
+## Example of parallel processing on Windows via 'doSMP'
+\dontrun{
+library(doSMP)
+w <- startWorkers()
+registerDoSMP(w)
+
+fit2 <- bootPolywog(fit1, nboot = 100, .parallel = TRUE)
+
+stopWorkers(w)
+}
+}
+\author{
+Brenton Kenkel and Curtis S. Signorino
+}
+
