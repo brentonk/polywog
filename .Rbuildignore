@@ -1,8 +1,9 @@
 # Tarballs of previous package versions
-archive/*
+^archive/
+tar\.gz$
 
 # Local test files
-test.local/*
+^test\.local/
 
 # NEWS file (since CRAN dislikes Markdown format)
-NEWS.md
+^NEWS\.md$
