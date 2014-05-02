@@ -9,11 +9,19 @@ version of the package
 [from CRAN](http://cran.r-project.org/web/packages/polywog/index.html) by
 running
 
-```r
+```splus
 install.packages("polywog")
 ```
 
-in an R console.
+in an R console.  You can install the (potentially unstable) development
+version of the package using the `install_github` function from
+[the indispensable `devtools` package](https://github.com/hadley/devtools):
+
+```splus
+install.packages("devtools")
+library("devtools")
+install_github("brentonk/polywog-package@develop")
+```
 
 To request a feature or report a bug, please visit the package's [project page
 on Github](https://github.com/brentonk/polywog-package).  The package's
