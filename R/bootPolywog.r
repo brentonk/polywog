@@ -186,7 +186,7 @@ bootPolywog <- function(model,
 
     ## Construct the bootstrap matrix, with each column being a set of
     ## coefficients (*not* each row as in v0.3.0 and earlier)
-    ans <- do.call(cBind, ans)
+    ans <- Reduce(cBind, ans)
     rownames(ans) <- names(coef(model))
 
     ## If .matrixOnly (typically only used within 'polywog'), return only the
