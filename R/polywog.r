@@ -1,5 +1,11 @@
 ##' @useDynLib polywog
 ##' @importFrom Rcpp sourceCpp
+##' @importFrom graphics bxp lines par plot
+##' @importFrom stats .checkMFClasses .getXlevels binomial coef delete.response
+##'     density dlogis formula glm.fit model.frame model.matrix model.response
+##'     model.weights na.pass napredict predict printCoefmat quantile sd terms
+##'     update var vcov
+##' @importFrom utils setTxtProgressBar txtProgressBar
 NULL
 
 ##' Bootstrapped basis regression with oracle model selection

@@ -1,4 +1,4 @@
-##' @S3method print polywog
+##' @export
 print.polywog <- function(x, ...)
 {
     ## Print the function call used to fit the model (using same code as in

@@ -168,7 +168,7 @@ summary.margEff.polywog <- function(object, probs = seq(0, 1, by = 0.25), ...)
     object
 }
 
-##' @S3method print summary.margEff.polywog
+##' @export
 print.summary.margEff.polywog <- function(x,
                                           digits = max(3, getOption("digits") - 3),
                                           ...)
