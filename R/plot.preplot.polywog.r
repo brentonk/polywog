@@ -1,4 +1,4 @@
-##' @S3method plot preplot.polywog
+##' @export
 plot.preplot.polywog <- function(x, auto.set.par = TRUE,
                                  FUN3D = c("contour", "filled.contour",
                                  "wireframe", "persp3d"),
@@ -52,9 +52,9 @@ plot.preplot.polywog <- function(x, auto.set.par = TRUE,
 
         ## Take user input about which 3D plotting function to use
         FUN3D <- match.arg(FUN3D)
-        if (FUN3D == "wireframe" && !require("lattice")) {
+        if (FUN3D == "wireframe" && !requireNamespace("lattice")) {
             stop("'lattice' package required for FUN3D = \"wireframe\"")
-        } else if (FUN3D == "persp3d" && !require("rgl")) {
+        } else if (FUN3D == "persp3d" && !requireNamespace("rgl")) {
             stop("'rgl' package required for FUN3D = \"persp3d\"")
         }
 
@@ -88,10 +88,10 @@ plot.preplot.polywog <- function(x, auto.set.par = TRUE,
                 ## Confidence regions
                 upr <- matrix(x$upr, nrow = length(var1))
                 lwr <- matrix(x$lwr, nrow = length(var1))
-                persp3d(x = var1, y = var2, z = upr,
-                        col = "gray70", alpha = 0.7, add = TRUE)
-                persp3d(x = var1, y = var2, z = lwr,
-                        col = "gray70", alpha = 0.7, add = TRUE)
+                rgl::persp3d(x = var1, y = var2, z = upr,
+                             col = "gray70", alpha = 0.7, add = TRUE)
+                rgl::persp3d(x = var1, y = var2, z = lwr,
+                             col = "gray70", alpha = 0.7, add = TRUE)
             }
         } else {
             cl <- list(z = fit, x = var1, y = var2)

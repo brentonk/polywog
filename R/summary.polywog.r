@@ -51,7 +51,7 @@ summary.polywog <- function(object, level = .95, prop0 = FALSE, ...)
     return(ans)
 }
 
-##' @S3method print summary.polywog
+##' @export
 print.summary.polywog <- function(x, digits = max(3, getOption("digits") - 3),
                                   ...)
 {

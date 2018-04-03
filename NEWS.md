@@ -1,5 +1,13 @@
 # polywog package news
 
+## polywog 0.4-1 (April 2018)
+
+* Dependency changes:
+    * Occupational prestige data for the examples is now drawn from `carData` package (formerly `car`)
+
+* Other minor changes to namespace calls to pass CRAN checks
+
+
 ## polywog 0.4-0 (April 2014)
 
 * `predVals()` has been rewritten to compute fitted values according to the

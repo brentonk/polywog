@@ -1,4 +1,4 @@
-##' @S3method vcov polywog
+##' @export
 vcov.polywog <- function(object, ...)
 {
     ncf <- length(coef(object))
