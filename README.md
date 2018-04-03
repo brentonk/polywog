@@ -6,7 +6,7 @@ polywog
 routines for flexible functional form estimation via basis regression with
 oracle-penalized model selection.  You can install the most recent stable
 version of the package
-[from CRAN](http://cran.r-project.org/web/packages/polywog/index.html) by
+[from CRAN](https://cran.r-project.org/package=polywog) by
 running
 
 ```r
@@ -24,8 +24,8 @@ The statistical methods implemented in `polywog` are documented and applied in
 the following working papers:
 
 * ["Bootstrapped Basis Regression with Variable Selection: A New Method for
-Flexible Functional Form Estimation"](http://www.rochester.edu/College/gradstudents/bkenkel/data/basics.pdf)
+Flexible Functional Form Estimation"](http://bkenkel.com/data/basics.pdf)
 
-* ["An Alternative Solution to the Heckman Selection Problem: Selection Bias as Functional Form Misspecification"](http://polmeth.wustl.edu/mediaDetail.php?docId=1359)
+* "An Alternative Solution to the Heckman Selection Problem: Selection Bias as Functional Form Misspecification"
 
-* ["Data Mining for Theorists"](http://polmeth.wustl.edu/mediaDetail.php?docId=1278)
+* "Data Mining for Theorists"
