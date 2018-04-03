@@ -1,5 +1,5 @@
 ## Using occupational prestige data
-data(Prestige, package = "car")
+data(Prestige, package = "carData")
 Prestige <- transform(Prestige, income = income / 1000)
 
 ## Examine degrees 1 through 4
