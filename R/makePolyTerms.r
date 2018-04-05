@@ -15,7 +15,7 @@
 ##   polynomial expansion, and each entry ij is the degree of raw term i in
 ##   expansion term j
 ##
-makePolyTerms <- function(degree, k_expand, k_lin, binary_cols, names. = NULL)
+makePolyTerms <- function(degree, k_expand, k_lin, binary_cols,  names. = NULL)
 {
     ## Call C++ routine to compute the full set of potential polynomial terms
     ans <- computePolyTerms(degree, k_expand, k_lin)
@@ -53,6 +53,6 @@ makePolyTerms <- function(degree, k_expand, k_lin, binary_cols, names. = NULL)
         })
         rownames(ans) <- termNames
     }
-
+    
     ans
 }

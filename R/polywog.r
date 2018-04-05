@@ -199,6 +199,8 @@ polywog <- function(formula,
                     weights,
                     na.action,
                     degree = 3,
+                    noint = FALSE, 
+                    onlyint = FALSE, 
                     family = c("gaussian", "binomial"),
                     method = c("alasso", "scad"),
                     penwt.method = c("lm", "glm"),
@@ -256,7 +258,13 @@ polywog <- function(formula,
                                k_lin = attr(X, "k_lin"),
                                binary_cols = attr(X, "binary_cols"),
                                names. = colnames(X))
-
+    if(noint){
+        polyTerms <- polyTerms[which(apply(polyTerms, 1, function(x)sum(x!= 0)) == 1), ]
+    }
+    if(onlyint){
+        polyTerms <- polyTerms[-which(apply(polyTerms, 1, function(x)sum(x!= 0)) == 1 & 
+        rowSums(polyTerms) > 1), ]
+    }
     ## Extract weights if any (same code as in 'lm')
     w <- as.vector(model.weights(mf))
     if (!is.null(w) && !is.numeric(w))

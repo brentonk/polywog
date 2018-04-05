@@ -2,13 +2,14 @@
 \alias{polywog}
 \title{Polynomial regression with oracle variable selection}
 \usage{
-polywog(formula, data, subset, weights, na.action, degree = 3,
-  family = c("gaussian", "binomial"), method = c("alasso", "scad"),
-  penwt.method = c("lm", "glm"), unpenalized = character(0),
-  .parallel = FALSE, boot = 0, control.boot = control.bp(.parallel =
-  .parallel), lambda = NULL, nlambda = 100, lambda.min.ratio = 1e-04,
-  nfolds = 10, foldid = NULL, thresh = ifelse(method == "alasso", 1e-07,
-  0.001), maxit = ifelse(method == "alasso", 1e+05, 5000), model = TRUE,
+polywog(formula, data, subset, weights, na.action, degree = 3, 
+  noint = FALSE, onlyint = FALSE, family = c("gaussian", "binomial"), 
+  method = c("alasso", "scad"), penwt.method = c("lm", "glm"), 
+  unpenalized = character(0), .parallel = FALSE, boot = 0, 
+  control.boot = control.bp(.parallel=.parallel), lambda = NULL, 
+  nlambda = 100, lambda.min.ratio = 1e-04, nfolds = 10, foldid = NULL, 
+  thresh = ifelse(method == "alasso", 1e-07, 0.001), 
+  maxit = ifelse(method == "alasso", 1e+05, 5000), model = TRUE,
   X = FALSE, y = FALSE)
 }
 \arguments{
@@ -30,6 +31,14 @@ polywog(formula, data, subset, weights, na.action, degree = 3,
 
   \item{degree}{integer specifying the degree of the
   polynomial expansion of the input variables.}
+
+  \item{noint}{Logical indicating whether (if \code{FALSE}) or 
+  not (if \code{TRUE}) interactions should be included in 
+  the design matrix.  }
+
+  \item{onlyint}{Logical indicating whether (if \code{FALSE}) or 
+  not (if \code{TRUE}) polynomials beyond first degree should be 
+  included in the design matrix.}
 
   \item{family}{\code{"gaussian"} (default) or
   \code{"binomial"} for logistic regression (binary
