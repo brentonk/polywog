@@ -34,7 +34,7 @@ fitSCAD <- function(X,
 
     if (is.null(lambda) || length(lambda) > 1) {
         ## Cross-validate
-        ans <- do.call(cv.ncvreg, ans)
+        ans <- do.call("cv.ncvreg", ans)
 
         ## Extract information about cross-validation
         lambdaCV <- list(lambda = ans$lambda,
@@ -48,7 +48,7 @@ fitSCAD <- function(X,
                     
     } else {
         ## Fit directly using the specified penalization factor
-        ans <- do.call(ncvreg, ans)
+        ans <- do.call("ncvreg", ans)
         ans <- list(coef = coef(ans),
                     lambda = lambda,
                     lambda.cv = NULL)
