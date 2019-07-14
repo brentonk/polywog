@@ -76,7 +76,7 @@ value/level of the other.
 }
 \examples{
 ## Using occupational prestige data
-data(Prestige, package = "car")
+data(Prestige, package = "carData")
 Prestige <- transform(Prestige, income = income / 1000)
 
 ## Fit a polywog model with bootstrap iterations

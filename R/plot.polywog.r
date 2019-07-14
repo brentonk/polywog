@@ -48,8 +48,7 @@
 ##' @example inst/examples/plot.polywog.r
 plot.polywog <- function(x, which = NULL, ask = FALSE, auto.set.par = TRUE,
                          interval = TRUE, level = 0.95,
-                         FUN3D = c("contour", "filled.contour", "wireframe",
-                         "persp3d"),
+                         FUN3D = c("contour", "filled.contour", "wireframe"),
                          control.plot = list(),
                          ...)
 {

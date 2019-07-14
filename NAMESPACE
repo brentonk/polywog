@@ -11,6 +11,9 @@ S3method(print,summary.polywog)
 S3method(summary,margEff.polywog)
 S3method(summary,polywog)
 S3method(vcov,polywog)
+S3method(AIC, polywog)
+S3method(BIC, polywog)
+S3method(logLik, polywog)
 export(bootPolywog)
 export(control.bp)
 export(cv.polywog)
@@ -21,6 +24,15 @@ import(foreach)
 import(glmnet)
 import(iterators)
 import(ncvreg)
+importFrom("lattice", "wireframe")
+importFrom("graphics", "bxp", "lines", "par", "plot")
+importFrom("stats", ".checkMFClasses", ".getXlevels", "binomial",
+            "coef", "delete.response", "density", "dlogis", "formula",
+            "glm.fit", "model.frame", "model.matrix", "model.response",
+            "model.weights", "na.pass", "napredict", "predict",
+            "printCoefmat", "quantile", "sd", "terms", "update", "var",
+            "vcov")
+importFrom("utils", "setTxtProgressBar", "txtProgressBar")
 importFrom(Matrix,Matrix)
 importFrom(Matrix,cBind)
 importFrom(Rcpp,sourceCpp)

@@ -74,26 +74,27 @@ plot.preplot.polywog <- function(x, auto.set.par = TRUE,
             if (is.null(cl$zlab))
                 cl$zlab <- "fitted value"
             print(do.call(FUN3D, cl))
-        } else if (FUN3D == "persp3d") {
-            cl <- list(x = var1, y = var2, z = fit)
-            cl <- c(cl, control.plot)
-            if (is.null(cl$xlab))
-                cl$xlab <- xvars[1]
-            if (is.null(cl$ylab))
-                cl$ylab <- xvars[2]
-            if (is.null(cl$zlab))
-                cl$zlab <- "fitted value"
-            do.call(FUN3D, cl)
-            if (attr(x, "interval")) {
-                ## Confidence regions
-                upr <- matrix(x$upr, nrow = length(var1))
-                lwr <- matrix(x$lwr, nrow = length(var1))
-                persp3d(x = var1, y = var2, z = upr,
-                        col = "gray70", alpha = 0.7, add = TRUE)
-                persp3d(x = var1, y = var2, z = lwr,
-                        col = "gray70", alpha = 0.7, add = TRUE)
-            }
-        } else {
+        } #  else if (FUN3D == "persp3d") {
+        #     cl <- list(x = var1, y = var2, z = fit)
+        #     cl <- c(cl, control.plot)
+        #     if (is.null(cl$xlab))
+        #         cl$xlab <- xvars[1]
+        #     if (is.null(cl$ylab))
+        #         cl$ylab <- xvars[2]
+        #     if (is.null(cl$zlab))
+        #         cl$zlab <- "fitted value"
+        #     do.call(FUN3D, cl)
+        #     if (attr(x, "interval")) {
+        #         ## Confidence regions
+        #         upr <- matrix(x$upr, nrow = length(var1))
+        #         lwr <- matrix(x$lwr, nrow = length(var1))
+        #         persp3d(x = var1, y = var2, z = upr,
+        #                 col = "gray70", alpha = 0.7, add = TRUE)
+        #         persp3d(x = var1, y = var2, z = lwr,
+        #                 col = "gray70", alpha = 0.7, add = TRUE)
+        #     }
+        # } 
+        else {
             cl <- list(z = fit, x = var1, y = var2)
             cl <- c(cl, control.plot)
             if (is.null(cl$xlab))

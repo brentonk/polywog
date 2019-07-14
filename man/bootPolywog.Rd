@@ -100,7 +100,7 @@ sequentially within each iteration.
 }
 \examples{
 ## Using occupational prestige data
-data(Prestige, package = "car")
+data(Prestige, package = "carData")
 Prestige <- transform(Prestige, income = income / 1000)
 
 ## Fit a polywog model without bootstrapping

@@ -218,7 +218,7 @@ TRUE)}.
 }
 \examples{
 ## Using occupational prestige data
-data(Prestige, package = "car")
+data(Prestige, package = "carData")
 Prestige <- transform(Prestige, income = income / 1000)
 
 ## Fit a polywog model with bootstrap iterations
@@ -240,10 +240,6 @@ predVals(fit1, "education", n = 10)
 
 ## Plot univariate relationships
 plot(fit1)
-
-## Use SCAD instead of adaptive LASSO
-fit2 <- update(fit1, method = "scad", thresh = 1e-3)
-cbind(coef(fit1), coef(fit2))
 }
 \author{
 Brenton Kenkel and Curtis S. Signorino
