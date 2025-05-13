@@ -1,5 +1,10 @@
 # polywog package news
 
+## polywog 0.4-2 (May 2025)
+
+* Under-the-hood changes to pass CRAN checks
+
+
 ## polywog 0.4-1 (April 2018)
 
 * Dependency changes:

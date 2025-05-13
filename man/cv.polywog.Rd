@@ -4,8 +4,15 @@
 \alias{cv.polywog}
 \title{Cross-validation of polynomial degree and penalization factor}
 \usage{
-cv.polywog(formula, ..., degrees.cv = 1:3, nfolds = 10, model = TRUE,
-  X = FALSE, y = FALSE)
+cv.polywog(
+  formula,
+  ...,
+  degrees.cv = 1:3,
+  nfolds = 10,
+  model = TRUE,
+  X = FALSE,
+  y = FALSE
+)
 }
 \arguments{
 \item{formula}{model formula specifying the response and input variables.}
@@ -54,7 +61,7 @@ factor for a \code{\link{polywog}} model.
 }
 \details{
 When fitting with \code{method = "scad"}, different fold assignments are
-used for each polynomial degree specified, because \code{\link{cv.ncvreg}}
+used for each polynomial degree specified, because \code{\link[ncvreg]{cv.ncvreg}}
 does not allow for custom fold assignments.  This may affect the accuracy
 of the estimated cross-validation error for each degree.  When
 \code{method = "scad"}, the calls to \code{\link{polywog}} made by

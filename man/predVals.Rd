@@ -4,9 +4,19 @@
 \alias{predVals}
 \title{Easy computation of fitted values}
 \usage{
-predVals(model, xvars, data = model$model, xlims = list(), n = 100,
-  interval = TRUE, level = 0.95, maxrows = 10000, report = FALSE,
-  .parallel = FALSE, ...)
+predVals(
+  model,
+  xvars,
+  data = model$model,
+  xlims = list(),
+  n = 100,
+  interval = TRUE,
+  level = 0.95,
+  maxrows = 10000,
+  report = FALSE,
+  .parallel = FALSE,
+  ...
+)
 }
 \arguments{
 \item{model}{a fitted model of class \code{"polywog"}, typically the output

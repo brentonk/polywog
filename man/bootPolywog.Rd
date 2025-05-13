@@ -5,14 +5,36 @@
 \alias{control.bp}
 \title{Bootstrap a fitted polywog model}
 \usage{
-bootPolywog(model, nboot = 100, .parallel = FALSE, reuse.lambda = FALSE,
-  reuse.penwt = FALSE, nlambda = 100, lambda.min.ratio = 1e-04,
-  nfolds = 10, thresh = NULL, maxit = NULL, maxtries = 1000,
-  min.prop = 0, report = FALSE, .matrixOnly = FALSE)
+bootPolywog(
+  model,
+  nboot = 100,
+  .parallel = FALSE,
+  reuse.lambda = FALSE,
+  reuse.penwt = FALSE,
+  nlambda = 100,
+  lambda.min.ratio = 1e-04,
+  nfolds = 10,
+  thresh = NULL,
+  maxit = NULL,
+  maxtries = 1000,
+  min.prop = 0,
+  report = FALSE,
+  .matrixOnly = FALSE
+)
 
-control.bp(.parallel = FALSE, reuse.lambda = FALSE, reuse.penwt = FALSE,
-  nlambda = 100, lambda.min.ratio = 1e-04, nfolds = 10, thresh = NULL,
-  maxit = NULL, maxtries = 1000, min.prop = 0, report = FALSE)
+control.bp(
+  .parallel = FALSE,
+  reuse.lambda = FALSE,
+  reuse.penwt = FALSE,
+  nlambda = 100,
+  lambda.min.ratio = 1e-04,
+  nfolds = 10,
+  thresh = NULL,
+  maxit = NULL,
+  maxtries = 1000,
+  min.prop = 0,
+  report = FALSE
+)
 }
 \arguments{
 \item{model}{a fitted model of class \code{"polywog"}, typically the output
@@ -22,7 +44,7 @@ of \code{\link{cv.polywog}}.}
 \item{nboot}{number of bootstrap iterations.}
 
 \item{.parallel}{logical: whether to perform computations in parallel
-using a backend registered with \code{\link{foreach}}.}
+using a backend registered with \code{\link[foreach]{foreach}}.}
 
 \item{reuse.lambda}{logical: whether to use the penalization parameter from
 the original fit (\code{TRUE}), or to cross-validate within each iteration
@@ -67,7 +89,7 @@ If \code{.matrixOnly = FALSE}, the returned object is \code{model}
 with the bootstrap matrix included as its \code{boot.matrix} element.  If
 \code{.matrixOnly = TRUE}, just the matrix is returned.  In either case, the
 bootstrap matrix is a sparse matrix of class
-\code{"\linkS4class{dgCMatrix}"}.
+\code{"\link[Matrix:dgCMatrix-class]{dgCMatrix-class}"}.
 }
 \description{
 Nonparametric bootstrap of the \code{\link{polywog}} regression procedure.

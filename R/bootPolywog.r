@@ -17,7 +17,7 @@
 ##' of \code{\link{cv.polywog}}.
 ##' @param nboot number of bootstrap iterations.
 ##' @param .parallel logical: whether to perform computations in parallel
-##' using a backend registered with \code{\link{foreach}}.
+##' using a backend registered with \code{\link[foreach]{foreach}}.
 ##' @param reuse.lambda logical: whether to use the penalization parameter from
 ##' the original fit (\code{TRUE}), or to cross-validate within each iteration
 ##' (\code{FALSE}, default).
@@ -49,7 +49,7 @@
 ##' with the bootstrap matrix included as its \code{boot.matrix} element.  If
 ##' \code{.matrixOnly = TRUE}, just the matrix is returned.  In either case, the
 ##' bootstrap matrix is a sparse matrix of class
-##' \code{"\linkS4class{dgCMatrix}"}.
+##' \code{"\link[Matrix:dgCMatrix-class]{dgCMatrix-class}"}.
 ##' @author Brenton Kenkel and Curtis S. Signorino
 ##' @export
 ##' @example inst/examples/bootPolywog.r

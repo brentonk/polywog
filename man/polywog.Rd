@@ -4,14 +4,31 @@
 \alias{polywog}
 \title{Polynomial regression with oracle variable selection}
 \usage{
-polywog(formula, data, subset, weights, na.action, degree = 3,
-  family = c("gaussian", "binomial"), method = c("alasso", "scad"),
-  penwt.method = c("lm", "glm"), unpenalized = character(0),
-  .parallel = FALSE, boot = 0, control.boot = control.bp(.parallel =
-  .parallel), lambda = NULL, nlambda = 100, lambda.min.ratio = 1e-04,
-  nfolds = 10, foldid = NULL, thresh = ifelse(method == "alasso", 1e-07,
-  0.001), maxit = ifelse(method == "alasso", 1e+05, 5000), model = TRUE,
-  X = FALSE, y = FALSE)
+polywog(
+  formula,
+  data,
+  subset,
+  weights,
+  na.action,
+  degree = 3,
+  family = c("gaussian", "binomial"),
+  method = c("alasso", "scad"),
+  penwt.method = c("lm", "glm"),
+  unpenalized = character(0),
+  .parallel = FALSE,
+  boot = 0,
+  control.boot = control.bp(.parallel = .parallel),
+  lambda = NULL,
+  nlambda = 100,
+  lambda.min.ratio = 1e-04,
+  nfolds = 10,
+  foldid = NULL,
+  thresh = ifelse(method == "alasso", 1e-07, 0.001),
+  maxit = ifelse(method == "alasso", 1e+05, 5000),
+  model = TRUE,
+  X = FALSE,
+  y = FALSE
+)
 }
 \arguments{
 \item{formula}{model formula specifying the response and input
@@ -78,8 +95,8 @@ observation used for fitting (only available when \code{method =
 "alasso"}).}
 
 \item{thresh}{convergence threshold, passed as the \code{thresh} argument
-to \code{\link{glmnet}} when \code{method = "alasso"} and as the
-\code{eps} argument to \code{\link{ncvreg}} when \code{method = "scad"}.}
+to \code{\link[glmnet]{glmnet}} when \code{method = "alasso"} and as the
+\code{eps} argument to \code{\link[ncvreg]{ncvreg}} when \code{method = "scad"}.}
 
 \item{maxit}{maximum number of iterations to allow in adaptive LASSO or
 SCAD fitting.}
@@ -116,7 +133,7 @@ regression of the response variable on the polynomial expansion of the
 input variables.}
   \item{\code{penwt}}{adaptive weight given to each term in the LASSO
 penalty (\code{NULL} for models fit via SCAD).}
-  \item{\code{formula}}{model formula, as a \code{\link{Formula}} object.}
+  \item{\code{formula}}{model formula, as a \code{\link[Formula:Formula]{Formula}} object.}
   \item{\code{degree}}{degree of the polynomial basis expansion.}
   \item{\code{family}}{model family, \code{"gaussian"} or
 \code{"binomial"}.}
@@ -148,7 +165,7 @@ the expanded model matrix, see \code{\link{model.matrix.polywog}}.}
   \item{\code{y}}{if \code{y = TRUE}, the response variable used in
 fitting; otherwise \code{NULL}.}
   \item{\code{boot.matrix}}{if \code{boot > 0}, a sparse matrix of class
-\code{"\linkS4class{dgCMatrix}"} where each column is the estimate from a
+\code{"\link[Matrix:dgCMatrix-class]{dgCMatrix-class}"} where each column is the estimate from a
 bootstrap replicate.  See \code{\link{bootPolywog}} for more information
 on bootstrapping.}
 }
@@ -187,9 +204,9 @@ average mean squared error of out-of-sample fits.  (To select both
 see \code{\link{cv.polywog}}.)
 
 The cross-validation process may be run in parallel via
-\code{\link{foreach}} by registering an appropriate backend and specifying
+\code{\link[foreach]{foreach}} by registering an appropriate backend and specifying
 \code{.parallel = TRUE}.  The appropriate backend is system-specific; see
-\code{\link{foreach}} for information on selecting and registering a
+\code{\link[foreach]{foreach}} for information on selecting and registering a
 backend.  The bootstrap iterations may also be run in parallel by
 specifying \code{control.boot = control.bp(.parallel = TRUE)}.
 }
@@ -235,9 +252,9 @@ To estimate variation via the bootstrap, see
 The polynomial degree may be selected via cross-validation using
 \code{\link{cv.polywog}}.
 
-Adaptive LASSO estimates are provided via \code{\link{glmnet}} and
-\code{\link{cv.glmnet}} from the \pkg{glmnet} package.  SCAD estimates are
-via \code{\link{ncvreg}} and \code{\link{cv.ncvreg}} in the \pkg{ncvreg}
+Adaptive LASSO estimates are provided via \code{\link[glmnet]{glmnet}} and
+\code{\link[glmnet]{cv.glmnet}} from the \pkg{glmnet} package.  SCAD estimates are
+via \code{\link[ncvreg]{ncvreg}} and \code{\link[ncvreg]{cv.ncvreg}} in the \pkg{ncvreg}
 package.
 }
 \author{

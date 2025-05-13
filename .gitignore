@@ -11,3 +11,5 @@ src/*.so
 
 # R CMD check output
 polywog.Rcheck/
+CRAN-SUBMISSION
+cran-comments.md

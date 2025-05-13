@@ -9,7 +9,7 @@ A package for flexible functional form estimation via bootstrapped basis
 regression with oracle model selection.  This version of the software should
 be considered \strong{in beta}.  For bug reports and feature requests,
 please email Brenton Kenkel (\email{brenton.kenkel@gmail.com}) or file an
-issue at \url{https://github.com/brentonk/polywog-package/issues}.
+issue at \url{https://github.com/brentonk/polywog/issues}.
 }
 \section{Acknowledgements}{
  We are grateful to Tyson Chatangier for many
@@ -24,3 +24,20 @@ Brenton Kenkel and Curtis S. Signorino.  2012.  "A Method for Flexible
 Functional Form Estimation: Bootstrapped Basis Regression with Variable
 Selection."  Typescript, University of Rochester.
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://github.com/brentonk/polywog}
+}
+
+}
+\author{
+\strong{Maintainer}: Brenton Kenkel \email{brenton.kenkel@gmail.com}
+
+Authors:
+\itemize{
+  \item Curtis S. Signorino
+}
+
+}
+\keyword{internal}

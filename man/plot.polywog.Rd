@@ -4,9 +4,17 @@
 \alias{plot.polywog}
 \title{Univariate and bivariate fitted value plots}
 \usage{
-\method{plot}{polywog}(x, which = NULL, ask = FALSE, auto.set.par = TRUE,
-  interval = TRUE, level = 0.95, FUN3D = c("contour", "filled.contour",
-  "wireframe", "persp3d"), control.plot = list(), ...)
+\method{plot}{polywog}(
+  x,
+  which = NULL,
+  ask = FALSE,
+  auto.set.par = TRUE,
+  interval = TRUE,
+  level = 0.95,
+  FUN3D = c("contour", "filled.contour", "wireframe", "persp3d"),
+  control.plot = list(),
+  ...
+)
 }
 \arguments{
 \item{x}{a fitted model of class \code{"polywog"}, typically the output

@@ -4,8 +4,16 @@
 \alias{predict.polywog}
 \title{Predict method for polywog objects}
 \usage{
-\method{predict}{polywog}(object, newdata, type = c("link", "response"),
-  interval = FALSE, level = 0.95, bag = FALSE, na.action = na.pass, ...)
+\method{predict}{polywog}(
+  object,
+  newdata,
+  type = c("link", "response"),
+  interval = FALSE,
+  level = 0.95,
+  bag = FALSE,
+  na.action = na.pass,
+  ...
+)
 }
 \arguments{
 \item{object}{a fitted model of class \code{"polywog"}, typically the output

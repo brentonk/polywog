@@ -7,7 +7,7 @@ if (getRversion() >= "2.15.1")
 ##' factor for a \code{\link{polywog}} model.
 ##'
 ##' When fitting with \code{method = "scad"}, different fold assignments are
-##' used for each polynomial degree specified, because \code{\link{cv.ncvreg}}
+##' used for each polynomial degree specified, because \code{\link[ncvreg]{cv.ncvreg}}
 ##' does not allow for custom fold assignments.  This may affect the accuracy
 ##' of the estimated cross-validation error for each degree.  When
 ##' \code{method = "scad"}, the calls to \code{\link{polywog}} made by

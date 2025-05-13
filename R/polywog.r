@@ -1,4 +1,4 @@
-##' @useDynLib polywog
+##' @useDynLib polywog, .registration = TRUE
 ##' @importFrom Rcpp sourceCpp
 ##' @importFrom graphics bxp lines par plot
 ##' @importFrom stats .checkMFClasses .getXlevels binomial coef delete.response
@@ -14,9 +14,9 @@ NULL
 ##' regression with oracle model selection.  This version of the software should
 ##' be considered \strong{in beta}.  For bug reports and feature requests,
 ##' please email Brenton Kenkel (\email{brenton.kenkel@@gmail.com}) or file an
-##' issue at \url{https://github.com/brentonk/polywog-package/issues}.
+##' issue at \url{https://github.com/brentonk/polywog/issues}.
 ##' @name polywog-package
-##' @docType package
+##' @keywords internal
 ##' @section Acknowledgements: We are grateful to Tyson Chatangier for many
 ##' helpful suggestions about an earlier version of the package.  We also thank
 ##' the Wallis Institute of Political Economy and the Theory and Statistics
@@ -26,7 +26,7 @@ NULL
 ##' Brenton Kenkel and Curtis S. Signorino.  2012.  "A Method for Flexible
 ##' Functional Form Estimation: Bootstrapped Basis Regression with Variable
 ##' Selection."  Typescript, University of Rochester.
-NULL
+"_PACKAGE"
 
 ##' Polynomial regression with oracle variable selection
 ##'
@@ -62,9 +62,9 @@ NULL
 ##' see \code{\link{cv.polywog}}.)
 ##'
 ##' The cross-validation process may be run in parallel via
-##' \code{\link{foreach}} by registering an appropriate backend and specifying
+##' \code{\link[foreach]{foreach}} by registering an appropriate backend and specifying
 ##' \code{.parallel = TRUE}.  The appropriate backend is system-specific; see
-##' \code{\link{foreach}} for information on selecting and registering a
+##' \code{\link[foreach]{foreach}} for information on selecting and registering a
 ##' backend.  The bootstrap iterations may also be run in parallel by
 ##' specifying \code{control.boot = control.bp(.parallel = TRUE)}.
 ##' @param formula model formula specifying the response and input
@@ -113,8 +113,8 @@ NULL
 ##' observation used for fitting (only available when \code{method =
 ##' "alasso"}).
 ##' @param thresh convergence threshold, passed as the \code{thresh} argument
-##' to \code{\link{glmnet}} when \code{method = "alasso"} and as the
-##' \code{eps} argument to \code{\link{ncvreg}} when \code{method = "scad"}.
+##' to \code{\link[glmnet]{glmnet}} when \code{method = "alasso"} and as the
+##' \code{eps} argument to \code{\link[ncvreg]{ncvreg}} when \code{method = "scad"}.
 ##' @param maxit maximum number of iterations to allow in adaptive LASSO or
 ##' SCAD fitting.
 ##' @param model logical: whether to include the model frame in the returned
@@ -145,7 +145,7 @@ NULL
 ##' input variables.}
 ##'   \item{\code{penwt}}{adaptive weight given to each term in the LASSO
 ##' penalty (\code{NULL} for models fit via SCAD).}
-##'   \item{\code{formula}}{model formula, as a \code{\link{Formula}} object.}
+##'   \item{\code{formula}}{model formula, as a \code{\link[Formula:Formula]{Formula}} object.}
 ##'   \item{\code{degree}}{degree of the polynomial basis expansion.}
 ##'   \item{\code{family}}{model family, \code{"gaussian"} or
 ##' \code{"binomial"}.}
@@ -177,7 +177,7 @@ NULL
 ##'   \item{\code{y}}{if \code{y = TRUE}, the response variable used in
 ##' fitting; otherwise \code{NULL}.}
 ##'   \item{\code{boot.matrix}}{if \code{boot > 0}, a sparse matrix of class
-##' \code{"\linkS4class{dgCMatrix}"} where each column is the estimate from a
+##' \code{"\link[Matrix:dgCMatrix-class]{dgCMatrix-class}"} where each column is the estimate from a
 ##' bootstrap replicate.  See \code{\link{bootPolywog}} for more information
 ##' on bootstrapping.}
 ##' }
@@ -188,9 +188,9 @@ NULL
 ##' The polynomial degree may be selected via cross-validation using
 ##' \code{\link{cv.polywog}}.
 ##'
-##' Adaptive LASSO estimates are provided via \code{\link{glmnet}} and
-##' \code{\link{cv.glmnet}} from the \pkg{glmnet} package.  SCAD estimates are
-##' via \code{\link{ncvreg}} and \code{\link{cv.ncvreg}} in the \pkg{ncvreg}
+##' Adaptive LASSO estimates are provided via \code{\link[glmnet]{glmnet}} and
+##' \code{\link[glmnet]{cv.glmnet}} from the \pkg{glmnet} package.  SCAD estimates are
+##' via \code{\link[ncvreg]{ncvreg}} and \code{\link[ncvreg]{cv.ncvreg}} in the \pkg{ncvreg}
 ##' package.
 ##' @references Brenton Kenkel and Curtis S. Signorino.  2012.  "A Method for
 ##' Flexible Functional Form Estimation: Bootstrapped Basis Regression with

@@ -7,3 +7,5 @@ tar\.gz$
 
 # NEWS file (since CRAN dislikes Markdown format)
 ^NEWS\.md$
+^cran-comments\.md$
+^CRAN-SUBMISSION$

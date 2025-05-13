@@ -5,6 +5,11 @@
 
 using namespace Rcpp;
 
+#ifdef RCPP_USE_GLOBAL_ROSTREAM
+Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
+Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
+#endif
+
 // computeExpandMatrix
 NumericMatrix computeExpandMatrix(NumericMatrix X, IntegerMatrix poly_terms);
 RcppExport SEXP _polywog_computeExpandMatrix(SEXP XSEXP, SEXP poly_termsSEXP) {
